@@ -1,3 +1,4 @@
+/*
 //========================================================================
 // GLFW 3.4 - www.glfw.org
 //------------------------------------------------------------------------
@@ -24,6 +25,7 @@
 //    distribution.
 //
 //========================================================================
+*/
 
 #pragma once
 
@@ -193,14 +195,14 @@ typedef void (APIENTRY * PFN_vkVoidFunction)(void);
  #error "No supported window creation API selected"
 #endif
 
-// Constructs a version number string from the public header macros
+/* Constructs a version number string from the public header macros */
 #define _GLFW_CONCAT_VERSION(m, n, r) #m "." #n "." #r
 #define _GLFW_MAKE_VERSION(m, n, r) _GLFW_CONCAT_VERSION(m, n, r)
 #define _GLFW_VERSION_NUMBER _GLFW_MAKE_VERSION(GLFW_VERSION_MAJOR, \
                                                 GLFW_VERSION_MINOR, \
                                                 GLFW_VERSION_REVISION)
 
-// Checks for whether the library has been initialized
+/* Checks for whether the library has been initialized */
 #define _GLFW_REQUIRE_INIT()                         \
     if (!_glfw.initialized)                          \
     {                                                \
@@ -214,17 +216,17 @@ typedef void (APIENTRY * PFN_vkVoidFunction)(void);
         return x;                                    \
     }
 
-// Swaps the provided pointers
-#define _GLFW_SWAP_POINTERS(x, y) \
+/* Swaps the provided pointers */
+#define _GLFW_SWAP_POINTERS(x, y, type) \
     {                             \
-        void* t;                  \
+        type t;                   \
         t = x;                    \
         x = y;                    \
         y = t;                    \
     }
 
-// Per-thread error structure
-//
+/* Per-thread error structure
+ */
 struct _GLFWerror
 {
     _GLFWerror*     next;
@@ -232,10 +234,10 @@ struct _GLFWerror
     char            description[_GLFW_MESSAGE_SIZE];
 };
 
-// Initialization configuration
-//
-// Parameters relating to the initialization of the library
-//
+/* Initialization configuration
+ *
+ * Parameters relating to the initialization of the library
+ */
 struct _GLFWinitconfig
 {
     GLFWbool      hatButtons;
@@ -245,12 +247,12 @@ struct _GLFWinitconfig
     } ns;
 };
 
-// Window configuration
-//
-// Parameters relating to the creation of the window but not directly related
-// to the framebuffer.  This is used to pass window creation parameters from
-// shared code to the platform API.
-//
+/* Window configuration
+ *
+ * Parameters relating to the creation of the window but not directly related
+ * to the framebuffer.  This is used to pass window creation parameters from
+ * shared code to the platform API.
+*/
 struct _GLFWwndconfig
 {
     int           width;
@@ -279,12 +281,12 @@ struct _GLFWwndconfig
     } win32;
 };
 
-// Context configuration
-//
-// Parameters relating to the creation of the context but not directly related
-// to the framebuffer.  This is used to pass context creation parameters from
-// shared code to the platform API.
-//
+/* Context configuration
+ *
+ * Parameters relating to the creation of the context but not directly related
+ * to the framebuffer.  This is used to pass context creation parameters from
+ * shared code to the platform API.
+ */
 struct _GLFWctxconfig
 {
     int           client;
@@ -303,14 +305,14 @@ struct _GLFWctxconfig
     } nsgl;
 };
 
-// Framebuffer configuration
-//
-// This describes buffers and their sizes.  It also contains
-// a platform-specific ID used to map back to the backend API object.
-//
-// It is used to pass framebuffer parameters from shared code to the platform
-// API and also to enumerate and select available framebuffer configs.
-//
+/* Framebuffer configuration
+ *
+ * This describes buffers and their sizes.  It also contains
+ * a platform-specific ID used to map back to the backend API object.
+ *
+ * It is used to pass framebuffer parameters from shared code to the platform
+ * API and also to enumerate and select available framebuffer configs.
+ */
 struct _GLFWfbconfig
 {
     int         redBits;
@@ -332,8 +334,8 @@ struct _GLFWfbconfig
     uintptr_t   handle;
 };
 
-// Context structure
-//
+/* Context structure
+ */
 struct _GLFWcontext
 {
     int                 client;
@@ -355,21 +357,21 @@ struct _GLFWcontext
     _GLFWgetprocaddressfun      getProcAddress;
     _GLFWdestroycontextfun      destroy;
 
-    // This is defined in the context API's context.h
+    /* This is defined in the context API's context.h */
     _GLFW_PLATFORM_CONTEXT_STATE;
-    // This is defined in egl_context.h
+    /* This is defined in egl_context.h */
     _GLFW_EGL_CONTEXT_STATE;
-    // This is defined in osmesa_context.h
+    /* This is defined in osmesa_context.h */
     _GLFW_OSMESA_CONTEXT_STATE;
 };
 
-// Window and context structure
-//
+/* Window and context structure
+ */
 struct _GLFWwindow
 {
     struct _GLFWwindow* next;
 
-    // Window settings and state
+    /* Window settings and state */
     GLFWbool            resizable;
     GLFWbool            decorated;
     GLFWbool            autoIconify;
@@ -391,7 +393,7 @@ struct _GLFWwindow
     int                 cursorMode;
     char                mouseButtons[GLFW_MOUSE_BUTTON_LAST + 1];
     char                keys[GLFW_KEY_LAST + 1];
-    // Virtual cursor position when cursor is disabled
+    /* Virtual cursor position when cursor is disabled */
     double              virtualCursorPosX, virtualCursorPosY;
     GLFWbool            rawMouseMotion;
 
@@ -417,21 +419,21 @@ struct _GLFWwindow
         GLFWdropfun             drop;
     } callbacks;
 
-    // This is defined in the window API's platform.h
+    /* This is defined in the window API's platform.h */
     _GLFW_PLATFORM_WINDOW_STATE;
 };
 
-// Monitor structure
-//
+/* Monitor structure
+ */
 struct _GLFWmonitor
 {
     char*           name;
     void*           userPointer;
 
-    // Physical dimensions in millimeters.
+    /* Physical dimensions in millimeters. */
     int             widthMM, heightMM;
 
-    // The window whose video mode is current on this monitor
+    /* The window whose video mode is current on this monitor */
     _GLFWwindow*    window;
 
     GLFWvidmode*    modes;
@@ -441,22 +443,22 @@ struct _GLFWmonitor
     GLFWgammaramp   originalRamp;
     GLFWgammaramp   currentRamp;
 
-    // This is defined in the window API's platform.h
+    /* This is defined in the window API's platform.h */
     _GLFW_PLATFORM_MONITOR_STATE;
 };
 
-// Cursor structure
-//
+/* Cursor structure
+ */
 struct _GLFWcursor
 {
     _GLFWcursor*    next;
 
-    // This is defined in the window API's platform.h
+    /* This is defined in the window API's platform.h */
     _GLFW_PLATFORM_CURSOR_STATE;
 };
 
-// Gamepad mapping element structure
-//
+/* Gamepad mapping element structure
+ */
 struct _GLFWmapelement
 {
     uint8_t         type;
@@ -465,8 +467,8 @@ struct _GLFWmapelement
     int8_t          axisOffset;
 };
 
-// Gamepad mapping structure
-//
+/* Gamepad mapping structure
+ */
 struct _GLFWmapping
 {
     char            name[128];
@@ -475,8 +477,8 @@ struct _GLFWmapping
     _GLFWmapelement axes[6];
 };
 
-// Joystick structure
-//
+/* Joystick structure
+ */
 struct _GLFWjoystick
 {
     GLFWbool        present;
@@ -491,28 +493,28 @@ struct _GLFWjoystick
     char            guid[33];
     _GLFWmapping*   mapping;
 
-    // This is defined in the joystick API's joystick.h
+    /* This is defined in the joystick API's joystick.h */
     _GLFW_PLATFORM_JOYSTICK_STATE;
 };
 
-// Thread local storage structure
-//
+/* Thread local storage structure
+ */
 struct _GLFWtls
 {
-    // This is defined in the platform's thread.h
+    /* This is defined in the platform's thread.h */
     _GLFW_PLATFORM_TLS_STATE;
 };
 
-// Mutex structure
-//
+/* Mutex structure
+ */
 struct _GLFWmutex
 {
-    // This is defined in the platform's thread.h
+    /* This is defined in the platform's thread.h */
     _GLFW_PLATFORM_MUTEX_STATE;
 };
 
-// Library global data
-//
+/* Library global data
+ */
 struct _GLFWlibrary
 {
     GLFWbool            initialized;
@@ -542,7 +544,7 @@ struct _GLFWlibrary
 
     struct {
         uint64_t        offset;
-        // This is defined in the platform's time.h
+        /* This is defined in the platform's time.h */
         _GLFW_PLATFORM_LIBRARY_TIMER_STATE;
     } timer;
 
@@ -572,26 +574,26 @@ struct _GLFWlibrary
         GLFWjoystickfun joystick;
     } callbacks;
 
-    // This is defined in the window API's platform.h
+    /* This is defined in the window API's platform.h */
     _GLFW_PLATFORM_LIBRARY_WINDOW_STATE;
-    // This is defined in the context API's context.h
+    /* This is defined in the context API's context.h */
     _GLFW_PLATFORM_LIBRARY_CONTEXT_STATE;
-    // This is defined in the platform's joystick.h
+    /* This is defined in the platform's joystick.h */
     _GLFW_PLATFORM_LIBRARY_JOYSTICK_STATE;
-    // This is defined in egl_context.h
+    /* This is defined in egl_context.h */
     _GLFW_EGL_LIBRARY_CONTEXT_STATE;
-    // This is defined in osmesa_context.h
+    /* This is defined in osmesa_context.h */
     _GLFW_OSMESA_LIBRARY_CONTEXT_STATE;
 };
 
-// Global state shared between compilation units of GLFW
-//
+/* Global state shared between compilation units of GLFW
+ */
 extern _GLFWlibrary _glfw;
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW platform API                      //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                       GLFW platform API                      /// */
+/* //////////////////////////////////////////////////////////////////// */
 
 int _glfwPlatformInit(void);
 void _glfwPlatformTerminate(void);
@@ -699,9 +701,9 @@ void _glfwPlatformLockMutex(_GLFWmutex* mutex);
 void _glfwPlatformUnlockMutex(_GLFWmutex* mutex);
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                         GLFW event API                       //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                         GLFW event API                       /// */
+/* //////////////////////////////////////////////////////////////////// */
 
 void _glfwInputWindowFocus(_GLFWwindow* window, GLFWbool focused);
 void _glfwInputWindowPos(_GLFWwindow* window, int xpos, int ypos);
@@ -740,9 +742,9 @@ void _glfwInputError(int code, const char* format, ...);
 #endif
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                       GLFW internal API                      /// */
+/* //////////////////////////////////////////////////////////////////// */
 
 GLFWbool _glfwStringInExtensionString(const char* string, const char* extensions);
 const _GLFWfbconfig* _glfwChooseFBConfig(const _GLFWfbconfig* desired,

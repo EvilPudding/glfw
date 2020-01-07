@@ -1,3 +1,4 @@
+/*
 //========================================================================
 // GLFW 3.4 GLX - www.glfw.org
 //------------------------------------------------------------------------
@@ -26,6 +27,7 @@
 //========================================================================
 // It is fine to use C99 in this file because it will not be built with VS
 //========================================================================
+*/
 
 #include "internal.h"
 
@@ -38,8 +40,8 @@
 #endif
 
 
-// Returns the specified attribute of the specified GLXFBConfig
-//
+/* Returns the specified attribute of the specified GLXFBConfig
+ */
 static int getGLXFBConfigAttrib(GLXFBConfig fbconfig, int attrib)
 {
     int value;
@@ -47,8 +49,8 @@ static int getGLXFBConfigAttrib(GLXFBConfig fbconfig, int attrib)
     return value;
 }
 
-// Return the GLXFBConfig most closely matching the specified hints
-//
+/* Return the GLXFBConfig most closely matching the specified hints
+ */
 static GLFWbool chooseGLXFBConfig(const _GLFWfbconfig* desired,
                                   GLXFBConfig* result)
 {
@@ -59,8 +61,8 @@ static GLFWbool chooseGLXFBConfig(const _GLFWfbconfig* desired,
     const char* vendor;
     GLFWbool trustWindowBit = GLFW_TRUE;
 
-    // HACK: This is a (hopefully temporary) workaround for Chromium
-    //       (VirtualBox GL) not setting the window bit on any GLXFBConfigs
+    /* HACK: This is a (hopefully temporary) workaround for Chromium
+     *       (VirtualBox GL) not setting the window bit on any GLXFBConfigs */
     vendor = glXGetClientString(_glfw.x11.display, GLX_VENDOR);
     if (vendor && strcmp(vendor, "Chromium") == 0)
         trustWindowBit = GLFW_FALSE;
@@ -81,11 +83,11 @@ static GLFWbool chooseGLXFBConfig(const _GLFWfbconfig* desired,
         const GLXFBConfig n = nativeConfigs[i];
         _GLFWfbconfig* u = usableConfigs + usableCount;
 
-        // Only consider RGBA GLXFBConfigs
+        /* Only consider RGBA GLXFBConfigs */
         if (!(getGLXFBConfigAttrib(n, GLX_RENDER_TYPE) & GLX_RGBA_BIT))
             continue;
 
-        // Only consider window GLXFBConfigs
+        /* Only consider window GLXFBConfigs */
         if (!(getGLXFBConfigAttrib(n, GLX_DRAWABLE_TYPE) & GLX_WINDOW_BIT))
         {
             if (trustWindowBit)
@@ -142,8 +144,8 @@ static GLFWbool chooseGLXFBConfig(const _GLFWfbconfig* desired,
     return closest != NULL;
 }
 
-// Create the OpenGL context using legacy API
-//
+/* Create the OpenGL context using legacy API
+ */
 static GLXContext createLegacyContextGLX(_GLFWwindow* window,
                                          GLXFBConfig fbconfig,
                                          GLXContext share)
@@ -225,7 +227,7 @@ static GLFWglproc getProcAddressGLX(const char* procname)
     else if (_glfw.glx.GetProcAddressARB)
         return _glfw.glx.GetProcAddressARB((const GLubyte*) procname);
     else
-        return _glfw_dlsym(_glfw.glx.handle, procname);
+        return (GLFWglproc)_glfw_dlsym(_glfw.glx.handle, procname);
 }
 
 static void destroyContextGLX(_GLFWwindow* window)
@@ -244,12 +246,12 @@ static void destroyContextGLX(_GLFWwindow* window)
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                       GLFW internal API                      /// */
+/* //////////////////////////////////////////////////////////////////// */
 
-// Initialize GLX
-//
+/* Initialize GLX
+ */
 GLFWbool _glfwInitGLX(void)
 {
     int i;
@@ -282,35 +284,35 @@ GLFWbool _glfwInitGLX(void)
         return GLFW_FALSE;
     }
 
-    _glfw.glx.GetFBConfigs =
+    _glfw.glx.GetFBConfigs = (PFNGLXGETFBCONFIGSPROC)
         _glfw_dlsym(_glfw.glx.handle, "glXGetFBConfigs");
-    _glfw.glx.GetFBConfigAttrib =
+    _glfw.glx.GetFBConfigAttrib = (PFNGLXGETFBCONFIGATTRIBPROC)
         _glfw_dlsym(_glfw.glx.handle, "glXGetFBConfigAttrib");
-    _glfw.glx.GetClientString =
+    _glfw.glx.GetClientString = (PFNGLXGETCLIENTSTRINGPROC)
         _glfw_dlsym(_glfw.glx.handle, "glXGetClientString");
-    _glfw.glx.QueryExtension =
+    _glfw.glx.QueryExtension = (PFNGLXQUERYEXTENSIONPROC)
         _glfw_dlsym(_glfw.glx.handle, "glXQueryExtension");
-    _glfw.glx.QueryVersion =
+    _glfw.glx.QueryVersion = (PFNGLXQUERYVERSIONPROC)
         _glfw_dlsym(_glfw.glx.handle, "glXQueryVersion");
-    _glfw.glx.DestroyContext =
+    _glfw.glx.DestroyContext = (PFNGLXDESTROYCONTEXTPROC)
         _glfw_dlsym(_glfw.glx.handle, "glXDestroyContext");
-    _glfw.glx.MakeCurrent =
+    _glfw.glx.MakeCurrent = (PFNGLXMAKECURRENTPROC)
         _glfw_dlsym(_glfw.glx.handle, "glXMakeCurrent");
-    _glfw.glx.SwapBuffers =
+    _glfw.glx.SwapBuffers = (PFNGLXSWAPBUFFERSPROC)
         _glfw_dlsym(_glfw.glx.handle, "glXSwapBuffers");
-    _glfw.glx.QueryExtensionsString =
+    _glfw.glx.QueryExtensionsString = (PFNGLXQUERYEXTENSIONSSTRINGPROC)
         _glfw_dlsym(_glfw.glx.handle, "glXQueryExtensionsString");
-    _glfw.glx.CreateNewContext =
+    _glfw.glx.CreateNewContext = (PFNGLXCREATENEWCONTEXTPROC)
         _glfw_dlsym(_glfw.glx.handle, "glXCreateNewContext");
-    _glfw.glx.CreateWindow =
+    _glfw.glx.CreateWindow = (PFNGLXCREATEWINDOWPROC)
         _glfw_dlsym(_glfw.glx.handle, "glXCreateWindow");
-    _glfw.glx.DestroyWindow =
+    _glfw.glx.DestroyWindow = (PFNGLXDESTROYWINDOWPROC)
         _glfw_dlsym(_glfw.glx.handle, "glXDestroyWindow");
-    _glfw.glx.GetProcAddress =
+    _glfw.glx.GetProcAddress = (PFNGLXGETPROCADDRESSPROC)
         _glfw_dlsym(_glfw.glx.handle, "glXGetProcAddress");
-    _glfw.glx.GetProcAddressARB =
+    _glfw.glx.GetProcAddressARB = (PFNGLXGETPROCADDRESSPROC)
         _glfw_dlsym(_glfw.glx.handle, "glXGetProcAddressARB");
-    _glfw.glx.GetVisualFromFBConfig =
+    _glfw.glx.GetVisualFromFBConfig = (PFNGLXGETVISUALFROMFBCONFIGPROC)
         _glfw_dlsym(_glfw.glx.handle, "glXGetVisualFromFBConfig");
 
     if (!_glfw.glx.GetFBConfigs ||
@@ -419,12 +421,12 @@ GLFWbool _glfwInitGLX(void)
     return GLFW_TRUE;
 }
 
-// Terminate GLX
-//
+/* Terminate GLX
+ */
 void _glfwTerminateGLX(void)
 {
-    // NOTE: This function must not call any X11 functions, as it is called
-    //       after XCloseDisplay (see _glfwPlatformTerminate for details)
+    /* NOTE: This function must not call any X11 functions, as it is called
+     *       after XCloseDisplay (see _glfwPlatformTerminate for details) */
 
     if (_glfw.glx.handle)
     {
@@ -440,8 +442,8 @@ void _glfwTerminateGLX(void)
     attribs[index++] = v; \
 }
 
-// Create the OpenGL or OpenGL ES context
-//
+/* Create the OpenGL or OpenGL ES context
+ */
 GLFWbool _glfwCreateContextGLX(_GLFWwindow* window,
                                const _GLFWctxconfig* ctxconfig,
                                const _GLFWfbconfig* fbconfig)
@@ -557,9 +559,9 @@ GLFWbool _glfwCreateContextGLX(_GLFWwindow* window,
                 setAttrib(GLX_CONTEXT_OPENGL_NO_ERROR_ARB, GLFW_TRUE);
         }
 
-        // NOTE: Only request an explicitly versioned context when necessary, as
-        //       explicitly requesting version 1.0 does not always return the
-        //       highest version supported by the driver
+        /* NOTE: Only request an explicitly versioned context when necessary, as
+         *       explicitly requesting version 1.0 does not always return the
+         *       highest version supported by the driver */
         if (ctxconfig->major != 1 || ctxconfig->minor != 0)
         {
             setAttrib(GLX_CONTEXT_MAJOR_VERSION_ARB, ctxconfig->major);
@@ -581,10 +583,10 @@ GLFWbool _glfwCreateContextGLX(_GLFWwindow* window,
                                               True,
                                               attribs);
 
-        // HACK: This is a fallback for broken versions of the Mesa
-        //       implementation of GLX_ARB_create_context_profile that fail
-        //       default 1.0 context creation with a GLXBadProfileARB error in
-        //       violation of the extension spec
+        /* HACK: This is a fallback for broken versions of the Mesa
+         *       implementation of GLX_ARB_create_context_profile that fail
+         *       default 1.0 context creation with a GLXBadProfileARB error in
+         *       violation of the extension spec */
         if (!window->context.glx.handle)
         {
             if (_glfw.x11.errorCode == _glfw.glx.errorBase + GLXBadProfileARB &&
@@ -631,8 +633,8 @@ GLFWbool _glfwCreateContextGLX(_GLFWwindow* window,
 
 #undef setAttrib
 
-// Returns the Visual and depth of the chosen GLXFBConfig
-//
+/* Returns the Visual and depth of the chosen GLXFBConfig
+ */
 GLFWbool _glfwChooseVisualGLX(const _GLFWwndconfig* wndconfig,
                               const _GLFWctxconfig* ctxconfig,
                               const _GLFWfbconfig* fbconfig,
@@ -664,9 +666,9 @@ GLFWbool _glfwChooseVisualGLX(const _GLFWwndconfig* wndconfig,
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                        GLFW native API                       //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                        GLFW native API                       /// */
+/* //////////////////////////////////////////////////////////////////// */
 
 GLFWAPI GLXContext glfwGetGLXContext(GLFWwindow* handle)
 {

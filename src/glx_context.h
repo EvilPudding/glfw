@@ -1,3 +1,4 @@
+/*
 //========================================================================
 // GLFW 3.4 GLX - www.glfw.org
 //------------------------------------------------------------------------
@@ -24,6 +25,7 @@
 //    distribution.
 //
 //========================================================================
+*/
 
 #define GLX_VENDOR 1
 #define GLX_RGBA_BIT 0x00000001
@@ -92,7 +94,7 @@ typedef int (*PFNGLXSWAPINTERVALMESAPROC)(int);
 typedef int (*PFNGLXSWAPINTERVALSGIPROC)(int);
 typedef GLXContext (*PFNGLXCREATECONTEXTATTRIBSARBPROC)(Display*,GLXFBConfig,GLXContext,Bool,const int*);
 
-// libGL.so function pointer typedefs
+/* libGL.so function pointer typedefs */
 #define glXGetFBConfigs _glfw.glx.GetFBConfigs
 #define glXGetFBConfigAttrib _glfw.glx.GetFBConfigAttrib
 #define glXGetClientString _glfw.glx.GetClientString
@@ -111,8 +113,8 @@ typedef GLXContext (*PFNGLXCREATECONTEXTATTRIBSARBPROC)(Display*,GLXFBConfig,GLX
 #define _GLFW_PLATFORM_LIBRARY_CONTEXT_STATE    _GLFWlibraryGLX glx
 
 
-// GLX-specific per-context data
-//
+/* GLX-specific per-context data
+ */
 typedef struct _GLFWcontextGLX
 {
     GLXContext      handle;
@@ -120,18 +122,18 @@ typedef struct _GLFWcontextGLX
 
 } _GLFWcontextGLX;
 
-// GLX-specific global data
-//
+/* GLX-specific global data
+ */
 typedef struct _GLFWlibraryGLX
 {
     int             major, minor;
     int             eventBase;
     int             errorBase;
 
-    // dlopen handle for libGL.so.1
+    /* dlopen handle for libGL.so.1 */
     void*           handle;
 
-    // GLX 1.3 functions
+    /* GLX 1.3 functions */
     PFNGLXGETFBCONFIGSPROC              GetFBConfigs;
     PFNGLXGETFBCONFIGATTRIBPROC         GetFBConfigAttrib;
     PFNGLXGETCLIENTSTRINGPROC           GetClientString;
@@ -146,7 +148,7 @@ typedef struct _GLFWlibraryGLX
     PFNGLXCREATEWINDOWPROC              CreateWindow;
     PFNGLXDESTROYWINDOWPROC             DestroyWindow;
 
-    // GLX 1.4 and extension functions
+    /* GLX 1.4 and extension functions */
     PFNGLXGETPROCADDRESSPROC            GetProcAddress;
     PFNGLXGETPROCADDRESSPROC            GetProcAddressARB;
     PFNGLXSWAPINTERVALSGIPROC           SwapIntervalSGI;

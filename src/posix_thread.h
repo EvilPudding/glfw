@@ -1,3 +1,4 @@
+/*
 //========================================================================
 // GLFW 3.4 POSIX - www.glfw.org
 //------------------------------------------------------------------------
@@ -24,6 +25,7 @@
 //    distribution.
 //
 //========================================================================
+*/
 
 #include <pthread.h>
 
@@ -31,8 +33,8 @@
 #define _GLFW_PLATFORM_MUTEX_STATE  _GLFWmutexPOSIX posix
 
 
-// POSIX-specific thread local storage data
-//
+/* POSIX-specific thread local storage data
+ */
 typedef struct _GLFWtlsPOSIX
 {
     GLFWbool        allocated;
@@ -40,8 +42,8 @@ typedef struct _GLFWtlsPOSIX
 
 } _GLFWtlsPOSIX;
 
-// POSIX-specific mutex data
-//
+/* POSIX-specific mutex data
+ */
 typedef struct _GLFWmutexPOSIX
 {
     GLFWbool        allocated;

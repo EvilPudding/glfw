@@ -1,3 +1,4 @@
+/*
 //========================================================================
 // GLFW 3.4 OSMesa - www.glfw.org
 //------------------------------------------------------------------------
@@ -24,6 +25,7 @@
 //    distribution.
 //
 //========================================================================
+*/
 
 #define OSMESA_RGBA 0x1908
 #define OSMESA_FORMAT 0x22
@@ -58,8 +60,8 @@ typedef GLFWglproc (GLAPIENTRY * PFN_OSMesaGetProcAddress)(const char*);
 #define _GLFW_OSMESA_LIBRARY_CONTEXT_STATE      _GLFWlibraryOSMesa osmesa
 
 
-// OSMesa-specific per-context data
-//
+/* OSMesa-specific per-context data
+ */
 typedef struct _GLFWcontextOSMesa
 {
     OSMesaContext       handle;
@@ -69,8 +71,8 @@ typedef struct _GLFWcontextOSMesa
 
 } _GLFWcontextOSMesa;
 
-// OSMesa-specific global data
-//
+/* OSMesa-specific global data
+ */
 typedef struct _GLFWlibraryOSMesa
 {
     void*           handle;

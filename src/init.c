@@ -1,3 +1,4 @@
+/*
 //========================================================================
 // GLFW 3.4 - www.glfw.org
 //------------------------------------------------------------------------
@@ -26,6 +27,7 @@
 //========================================================================
 // Please use C89 style variable declarations in this file because VS 2010
 //========================================================================
+*/
 
 #include "internal.h"
 #include "mappings.h"
@@ -37,30 +39,30 @@
 #include <assert.h>
 
 
-// The global variables below comprise all mutable global data in GLFW
-//
-// Any other global variable is a bug
+/* The global variables below comprise all mutable global data in GLFW
+ *
+ * Any other global variable is a bug */
 
-// Global state shared between compilation units of GLFW
-//
+/* Global state shared between compilation units of GLFW
+ */
 _GLFWlibrary _glfw = { GLFW_FALSE };
 
-// These are outside of _glfw so they can be used before initialization and
-// after termination
-//
+/* These are outside of _glfw so they can be used before initialization and
+ * after termination
+ */
 static _GLFWerror _glfwMainThreadError;
 static GLFWerrorfun _glfwErrorCallback;
 static _GLFWinitconfig _glfwInitHints =
 {
-    GLFW_TRUE,      // hat buttons
+    GLFW_TRUE,      /* hat buttons */
     {
-        GLFW_TRUE,  // macOS menu bar
-        GLFW_TRUE   // macOS bundle chdir
+        GLFW_TRUE,  /* macOS menu bar */
+        GLFW_TRUE   /* macOS bundle chdir */
     }
 };
 
-// Terminate the library
-//
+/* Terminate the library
+ */
 static void terminate(void)
 {
     int i;
@@ -109,9 +111,9 @@ static void terminate(void)
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                       GLFW internal API                      /// */
+/* //////////////////////////////////////////////////////////////////// */
 
 char* _glfw_strdup(const char* source)
 {
@@ -146,12 +148,12 @@ float _glfw_fmaxf(float a, float b)
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                         GLFW event API                       //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                         GLFW event API                       /// */
+/* //////////////////////////////////////////////////////////////////// */
 
-// Notifies shared code of an error
-//
+/* Notifies shared code of an error
+ */
 void _glfwInputError(int code, const char* format, ...)
 {
     _GLFWerror* error;
@@ -162,7 +164,7 @@ void _glfwInputError(int code, const char* format, ...)
         va_list vl;
 
         va_start(vl, format);
-        vsnprintf(description, sizeof(description), format, vl);
+        vsprintf(description, format, vl);
         va_end(vl);
 
         description[sizeof(description) - 1] = '\0';
@@ -219,9 +221,9 @@ void _glfwInputError(int code, const char* format, ...)
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                        GLFW public API                       //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                        GLFW public API                       /// */
+/* //////////////////////////////////////////////////////////////////// */
 
 GLFWAPI int glfwInit(void)
 {
@@ -336,7 +338,7 @@ GLFWAPI int glfwGetError(const char** description)
 
 GLFWAPI GLFWerrorfun glfwSetErrorCallback(GLFWerrorfun cbfun)
 {
-    _GLFW_SWAP_POINTERS(_glfwErrorCallback, cbfun);
+    _GLFW_SWAP_POINTERS(_glfwErrorCallback, cbfun, GLFWerrorfun);
     return cbfun;
 }
 

@@ -1,3 +1,4 @@
+/*
 //========================================================================
 // GLFW 3.4 EGL - www.glfw.org
 //------------------------------------------------------------------------
@@ -24,6 +25,7 @@
 //    distribution.
 //
 //========================================================================
+*/
 
 #if defined(_GLFW_USE_EGLPLATFORM_H)
  #include <EGL/eglplatform.h>
@@ -115,7 +117,7 @@ typedef void* EGLContext;
 typedef void* EGLDisplay;
 typedef void* EGLSurface;
 
-// EGL function pointer typedefs
+/* EGL function pointer typedefs */
 typedef EGLBoolean (EGLAPIENTRY * PFN_eglGetConfigAttrib)(EGLDisplay,EGLConfig,EGLint,EGLint*);
 typedef EGLBoolean (EGLAPIENTRY * PFN_eglGetConfigs)(EGLDisplay,EGLConfig*,EGLint,EGLint*);
 typedef EGLDisplay (EGLAPIENTRY * PFN_eglGetDisplay)(EGLNativeDisplayType);
@@ -153,8 +155,8 @@ typedef GLFWglproc (EGLAPIENTRY * PFN_eglGetProcAddress)(const char*);
 #define _GLFW_EGL_LIBRARY_CONTEXT_STATE    _GLFWlibraryEGL egl
 
 
-// EGL-specific per-context data
-//
+/* EGL-specific per-context data
+ */
 typedef struct _GLFWcontextEGL
 {
    EGLConfig        config;
@@ -165,8 +167,8 @@ typedef struct _GLFWcontextEGL
 
 } _GLFWcontextEGL;
 
-// EGL-specific global data
-//
+/* EGL-specific global data
+ */
 typedef struct _GLFWlibraryEGL
 {
     EGLDisplay      display;

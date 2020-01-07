@@ -1,3 +1,4 @@
+/*
 //========================================================================
 // GLFW 3.4 - www.glfw.org
 //------------------------------------------------------------------------
@@ -26,6 +27,7 @@
 //========================================================================
 // Please use C89 style variable declarations in this file because VS 2010
 //========================================================================
+*/
 
 #include "internal.h"
 
@@ -37,9 +39,9 @@
 #define _GLFW_REQUIRE_LOADER 2
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                       GLFW internal API                      /// */
+/* //////////////////////////////////////////////////////////////////// */
 
 GLFWbool _glfwInitVulkan(int mode)
 {
@@ -89,12 +91,12 @@ GLFWbool _glfwInitVulkan(int mode)
         _glfwTerminateVulkan();
         return GLFW_FALSE;
     }
-#endif // _GLFW_VULKAN_STATIC
+#endif /* _GLFW_VULKAN_STATIC */
 
     err = vkEnumerateInstanceExtensionProperties(NULL, &count, NULL);
     if (err)
     {
-        // NOTE: This happens on systems with a loader but without any Vulkan ICD
+        /* NOTE: This happens on systems with a loader but without any Vulkan ICD */
         if (mode == _GLFW_REQUIRE_LOADER)
         {
             _glfwInputError(GLFW_API_UNAVAILABLE,
@@ -214,9 +216,9 @@ const char* _glfwGetVulkanResultString(VkResult result)
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                        GLFW public API                       //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                        GLFW public API                       /// */
+/* //////////////////////////////////////////////////////////////////// */
 
 GLFWAPI int glfwVulkanSupported(void)
 {

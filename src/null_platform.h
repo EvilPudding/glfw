@@ -1,3 +1,4 @@
+/*
 //========================================================================
 // GLFW 3.4 - www.glfw.org
 //------------------------------------------------------------------------
@@ -24,6 +25,7 @@
 //    distribution.
 //
 //========================================================================
+*/
 
 #include <dlfcn.h>
 
@@ -52,8 +54,8 @@
  #define _glfw_dlsym(handle, name) dlsym(handle, name)
 #endif
 
-// Null-specific per-window data
-//
+/* Null-specific per-window data
+ */
 typedef struct _GLFWwindowNull
 {
     int width;

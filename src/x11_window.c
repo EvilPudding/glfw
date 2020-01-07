@@ -1,3 +1,4 @@
+/*
 //========================================================================
 // GLFW 3.4 X11 - www.glfw.org
 //------------------------------------------------------------------------
@@ -26,6 +27,7 @@
 //========================================================================
 // It is fine to use C99 in this file because it will not be built with VS
 //========================================================================
+*/
 
 #include "internal.h"
 
@@ -41,26 +43,26 @@
 #include <errno.h>
 #include <assert.h>
 
-// Action for EWMH client messages
+/* Action for EWMH client messages */
 #define _NET_WM_STATE_REMOVE        0
 #define _NET_WM_STATE_ADD           1
 #define _NET_WM_STATE_TOGGLE        2
 
-// Additional mouse button names for XButtonEvent
+/* Additional mouse button names for XButtonEvent */
 #define Button6            6
 #define Button7            7
 
-// Motif WM hints flags
+/* Motif WM hints flags */
 #define MWM_HINTS_DECORATIONS   2
 #define MWM_DECOR_ALL           1
 
 #define _GLFW_XDND_VERSION 5
 
 
-// Wait for data to arrive using select
-// This avoids blocking other threads via the per-display Xlib lock that also
-// covers GLX functions
-//
+/* Wait for data to arrive using select
+ * This avoids blocking other threads via the per-display Xlib lock that also
+ * covers GLX functions
+ */
 static GLFWbool waitForEvent(double* timeout)
 {
     fd_set fds;
@@ -84,11 +86,16 @@ static GLFWbool waitForEvent(double* timeout)
         {
             const long seconds = (long) *timeout;
             const long microseconds = (long) ((*timeout - seconds) * 1e6);
-            struct timeval tv = { seconds, microseconds };
+            struct timeval tv;
             const uint64_t base = _glfwPlatformGetTimerValue();
+			int result;
+			int error;
 
-            const int result = select(count, &fds, NULL, NULL, &tv);
-            const int error = errno;
+			tv.tv_sec = seconds;
+			tv.tv_usec = microseconds;
+
+            result = select(count, &fds, NULL, NULL, &tv);
+            error = errno;
 
             *timeout -= (_glfwPlatformGetTimerValue() - base) /
                 (double) _glfwPlatformGetTimerFrequency();
@@ -103,9 +110,9 @@ static GLFWbool waitForEvent(double* timeout)
     }
 }
 
-// Waits until a VisibilityNotify event arrives for the specified window or the
-// timeout period elapses (ICCCM section 4.2.2)
-//
+/* Waits until a VisibilityNotify event arrives for the specified window or the
+ * timeout period elapses (ICCCM section 4.2.2)
+ */
 static GLFWbool waitForVisibilityNotify(_GLFWwindow* window)
 {
     XEvent dummy;
@@ -123,8 +130,8 @@ static GLFWbool waitForVisibilityNotify(_GLFWwindow* window)
     return GLFW_TRUE;
 }
 
-// Returns whether the window is iconified
-//
+/* Returns whether the window is iconified
+ */
 static int getWindowState(_GLFWwindow* window)
 {
     int result = WithdrawnState;
@@ -147,8 +154,8 @@ static int getWindowState(_GLFWwindow* window)
     return result;
 }
 
-// Returns whether the event is a selection event
-//
+/* Returns whether the event is a selection event
+ */
 static Bool isSelectionEvent(Display* display, XEvent* event, XPointer pointer)
 {
     if (event->xany.window != _glfw.x11.helperWindowHandle)
@@ -159,8 +166,8 @@ static Bool isSelectionEvent(Display* display, XEvent* event, XPointer pointer)
            event->type == SelectionClear;
 }
 
-// Returns whether it is a _NET_FRAME_EXTENTS event for the specified window
-//
+/* Returns whether it is a _NET_FRAME_EXTENTS event for the specified window
+ */
 static Bool isFrameExtentsEvent(Display* display, XEvent* event, XPointer pointer)
 {
     _GLFWwindow* window = (_GLFWwindow*) pointer;
@@ -170,8 +177,8 @@ static Bool isFrameExtentsEvent(Display* display, XEvent* event, XPointer pointe
            event->xproperty.atom == _glfw.x11.NET_FRAME_EXTENTS;
 }
 
-// Returns whether it is a property event for the specified selection transfer
-//
+/* Returns whether it is a property event for the specified selection transfer
+ */
 static Bool isSelPropNewValueNotify(Display* display, XEvent* event, XPointer pointer)
 {
     XEvent* notification = (XEvent*) pointer;
@@ -181,8 +188,8 @@ static Bool isSelPropNewValueNotify(Display* display, XEvent* event, XPointer po
            event->xproperty.atom == notification->xselection.property;
 }
 
-// Translates an X event modifier state mask
-//
+/* Translates an X event modifier state mask
+ */
 static int translateState(int state)
 {
     int mods = 0;
@@ -203,25 +210,25 @@ static int translateState(int state)
     return mods;
 }
 
-// Translates an X11 key code to a GLFW key token
-//
+/* Translates an X11 key code to a GLFW key token
+ */
 static int translateKey(int scancode)
 {
-    // Use the pre-filled LUT (see createKeyTables() in x11_init.c)
+    /* Use the pre-filled LUT (see createKeyTables() in x11_init.c) */
     if (scancode < 0 || scancode > 255)
         return GLFW_KEY_UNKNOWN;
 
     return _glfw.x11.keycodes[scancode];
 }
 
-// Sends an EWMH or ICCCM event to the window manager
-//
+/* Sends an EWMH or ICCCM event to the window manager
+ */
 static void sendEventToWM(_GLFWwindow* window, Atom type,
                           long a, long b, long c, long d, long e)
 {
     XEvent event = { ClientMessage };
     event.xclient.window = window->x11.handle;
-    event.xclient.format = 32; // Data is 32-bit longs
+    event.xclient.format = 32; /* Data is 32-bit longs */
     event.xclient.message_type = type;
     event.xclient.data.l[0] = a;
     event.xclient.data.l[1] = b;
@@ -235,8 +242,8 @@ static void sendEventToWM(_GLFWwindow* window, Atom type,
                &event);
 }
 
-// Updates the normal hints according to the window settings
-//
+/* Updates the normal hints according to the window settings
+ */
 static void updateNormalHints(_GLFWwindow* window, int width, int height)
 {
     XSizeHints* hints = XAllocSizeHints();
@@ -284,8 +291,8 @@ static void updateNormalHints(_GLFWwindow* window, int width, int height)
     XFree(hints);
 }
 
-// Updates the full screen status of the window
-//
+/* Updates the full screen status of the window
+ */
 static void updateWindowMode(_GLFWwindow* window)
 {
     if (window->monitor)
@@ -312,13 +319,13 @@ static void updateWindowMode(_GLFWwindow* window)
         }
         else
         {
-            // This is the butcher's way of removing window decorations
-            // Setting the override-redirect attribute on a window makes the
-            // window manager ignore the window completely (ICCCM, section 4)
-            // The good thing is that this makes undecorated full screen windows
-            // easy to do; the bad thing is that we have to do everything
-            // manually and some things (like iconify/restore) won't work at
-            // all, as those are tasks usually performed by the window manager
+            /* This is the butcher's way of removing window decorations
+             * Setting the override-redirect attribute on a window makes the
+             * window manager ignore the window completely (ICCCM, section 4)
+             * The good thing is that this makes undecorated full screen windows
+             * easy to do; the bad thing is that we have to do everything
+             * manually and some things (like iconify/restore) won't work at
+             * all, as those are tasks usually performed by the window manager */
 
             XSetWindowAttributes attributes;
             attributes.override_redirect = True;
@@ -330,7 +337,7 @@ static void updateWindowMode(_GLFWwindow* window)
             window->x11.overrideRedirect = GLFW_TRUE;
         }
 
-        // Enable compositor bypass
+        /* Enable compositor bypass */
         if (!window->x11.transparent)
         {
             const unsigned long value = 1;
@@ -369,7 +376,7 @@ static void updateWindowMode(_GLFWwindow* window)
             window->x11.overrideRedirect = GLFW_FALSE;
         }
 
-        // Disable compositor bypass
+        /* Disable compositor bypass */
         if (!window->x11.transparent)
         {
             XDeleteProperty(_glfw.x11.display, window->x11.handle,
@@ -378,9 +385,9 @@ static void updateWindowMode(_GLFWwindow* window)
     }
 }
 
-// Splits and translates a text/uri-list into separate file paths
-// NOTE: This function destroys the provided string
-//
+/* Splits and translates a text/uri-list into separate file paths
+ * NOTE: This function destroys the provided string
+ */
 static char** parseUriList(char* text, int* count)
 {
     const char* prefix = "file://";
@@ -391,6 +398,7 @@ static char** parseUriList(char* text, int* count)
 
     while ((line = strtok(text, "\r\n")))
     {
+		char* path;
         text = NULL;
 
         if (line[0] == '#')
@@ -399,14 +407,14 @@ static char** parseUriList(char* text, int* count)
         if (strncmp(line, prefix, strlen(prefix)) == 0)
         {
             line += strlen(prefix);
-            // TODO: Validate hostname
+            /* TODO: Validate hostname */
             while (*line != '/')
                 line++;
         }
 
         (*count)++;
 
-        char* path = calloc(strlen(line) + 1, 1);
+        path = calloc(strlen(line) + 1, 1);
         paths = realloc(paths, *count * sizeof(char*));
         paths[*count - 1] = path;
 
@@ -414,7 +422,10 @@ static char** parseUriList(char* text, int* count)
         {
             if (line[0] == '%' && line[1] && line[2])
             {
-                const char digits[3] = { line[1], line[2], '\0' };
+                char digits[3];
+				digits[0] = line[1];
+				digits[1] = line[2];
+				digits[2] = '\0';
                 *path = strtol(digits, NULL, 16);
                 line += 2;
             }
@@ -429,9 +440,9 @@ static char** parseUriList(char* text, int* count)
     return paths;
 }
 
-// Encode a Unicode code point to a UTF-8 stream
-// Based on cutef8 by Jeff Bezanson (Public Domain)
-//
+/* Encode a Unicode code point to a UTF-8 stream
+ * Based on cutef8 by Jeff Bezanson (Public Domain)
+ */
 static size_t encodeUTF8(char* s, unsigned int ch)
 {
     size_t count = 0;
@@ -460,9 +471,9 @@ static size_t encodeUTF8(char* s, unsigned int ch)
     return count;
 }
 
-// Decode a Unicode code point from a UTF-8 stream
-// Based on cutef8 by Jeff Bezanson (Public Domain)
-//
+/* Decode a Unicode code point from a UTF-8 stream
+ * Based on cutef8 by Jeff Bezanson (Public Domain)
+ */
 #if defined(X_HAVE_UTF8_STRING)
 static unsigned int decodeUTF8(const char** s)
 {
@@ -485,18 +496,20 @@ static unsigned int decodeUTF8(const char** s)
 }
 #endif /*X_HAVE_UTF8_STRING*/
 
-// Convert the specified Latin-1 string to UTF-8
-//
+/* Convert the specified Latin-1 string to UTF-8
+ */
 static char* convertLatin1toUTF8(const char* source)
 {
     size_t size = 1;
     const char* sp;
+	char* target;
+	char* tp;
 
     for (sp = source;  *sp;  sp++)
         size += (*sp & 0x80) ? 2 : 1;
 
-    char* target = calloc(size, 1);
-    char* tp = target;
+    target = calloc(size, 1);
+    tp = target;
 
     for (sp = source;  *sp;  sp++)
         tp += encodeUTF8(tp, *sp);
@@ -504,8 +517,8 @@ static char* convertLatin1toUTF8(const char* source)
     return target;
 }
 
-// Updates the cursor image according to its cursor mode
-//
+/* Updates the cursor image according to its cursor mode
+ */
 static void updateCursorImage(_GLFWwindow* window)
 {
     if (window->cursorMode == GLFW_CURSOR_NORMAL)
@@ -525,8 +538,8 @@ static void updateCursorImage(_GLFWwindow* window)
     }
 }
 
-// Enable XI2 raw mouse motion events
-//
+/* Enable XI2 raw mouse motion events
+ */
 static void enableRawMouseMotion(_GLFWwindow* window)
 {
     XIEventMask em;
@@ -540,8 +553,8 @@ static void enableRawMouseMotion(_GLFWwindow* window)
     XISelectEvents(_glfw.x11.display, _glfw.x11.root, &em, 1);
 }
 
-// Disable XI2 raw mouse motion events
-//
+/* Disable XI2 raw mouse motion events
+ */
 static void disableRawMouseMotion(_GLFWwindow* window)
 {
     XIEventMask em;
@@ -554,8 +567,8 @@ static void disableRawMouseMotion(_GLFWwindow* window)
     XISelectEvents(_glfw.x11.display, _glfw.x11.root, &em, 1);
 }
 
-// Apply disabled cursor mode to a focused window
-//
+/* Apply disabled cursor mode to a focused window
+ */
 static void disableCursor(_GLFWwindow* window)
 {
     if (window->rawMouseMotion)
@@ -575,8 +588,8 @@ static void disableCursor(_GLFWwindow* window)
                  CurrentTime);
 }
 
-// Exit disabled cursor mode for the specified window
-//
+/* Exit disabled cursor mode for the specified window
+ */
 static void enableCursor(_GLFWwindow* window)
 {
     if (window->rawMouseMotion)
@@ -590,14 +603,15 @@ static void enableCursor(_GLFWwindow* window)
     updateCursorImage(window);
 }
 
-// Create the X11 window (and its colormap)
-//
+/* Create the X11 window (and its colormap)
+ */
 static GLFWbool createNativeWindow(_GLFWwindow* window,
                                    const _GLFWwndconfig* wndconfig,
                                    Visual* visual, int depth)
 {
     int width = wndconfig->width;
     int height = wndconfig->height;
+    XSetWindowAttributes wa = { 0 };
 
     if (wndconfig->scaleToMonitor)
     {
@@ -605,7 +619,7 @@ static GLFWbool createNativeWindow(_GLFWwindow* window,
         height *= _glfw.x11.contentScaleY;
     }
 
-    // Create a colormap based on the visual used by the current context
+    /* Create a colormap based on the visual used by the current context */
     window->x11.colormap = XCreateColormap(_glfw.x11.display,
                                            _glfw.x11.root,
                                            visual,
@@ -613,7 +627,6 @@ static GLFWbool createNativeWindow(_GLFWwindow* window,
 
     window->x11.transparent = _glfwIsVisualTransparentX11(visual);
 
-    XSetWindowAttributes wa = { 0 };
     wa.colormap = window->x11.colormap;
     wa.event_mask = StructureNotifyMask | KeyPressMask | KeyReleaseMask |
                     PointerMotionMask | ButtonPressMask | ButtonReleaseMask |
@@ -624,10 +637,10 @@ static GLFWbool createNativeWindow(_GLFWwindow* window,
 
     window->x11.handle = XCreateWindow(_glfw.x11.display,
                                        _glfw.x11.root,
-                                       0, 0,   // Position
+                                       0, 0,   /* Position */
                                        width, height,
-                                       0,      // Border width
-                                       depth,  // Color depth
+                                       0,      /* Border width */
+                                       depth,  /* Color depth */
                                        InputOutput,
                                        visual,
                                        CWBorderPixel | CWColormap | CWEventMask,
@@ -680,19 +693,17 @@ static GLFWbool createNativeWindow(_GLFWwindow* window,
         }
     }
 
-    // Declare the WM protocols supported by GLFW
+    /* Declare the WM protocols supported by GLFW */
     {
-        Atom protocols[] =
-        {
-            _glfw.x11.WM_DELETE_WINDOW,
-            _glfw.x11.NET_WM_PING
-        };
+        Atom protocols[2];
+		protocols[0] = _glfw.x11.WM_DELETE_WINDOW;
+		protocols[1] = _glfw.x11.NET_WM_PING;
 
         XSetWMProtocols(_glfw.x11.display, window->x11.handle,
                         protocols, sizeof(protocols) / sizeof(Atom));
     }
 
-    // Declare our PID
+    /* Declare our PID */
     {
         const long pid = getpid();
 
@@ -710,7 +721,7 @@ static GLFWbool createNativeWindow(_GLFWwindow* window,
                         PropModeReplace, (unsigned char*) &type, 1);
     }
 
-    // Set ICCCM WM_HINTS property
+    /* Set ICCCM WM_HINTS property */
     {
         XWMHints* hints = XAllocWMHints();
         if (!hints)
@@ -729,7 +740,7 @@ static GLFWbool createNativeWindow(_GLFWwindow* window,
 
     updateNormalHints(window, width, height);
 
-    // Set ICCCM WM_CLASS property
+    /* Set ICCCM WM_CLASS property */
     {
         XClassHint* hint = XAllocClassHint();
 
@@ -759,7 +770,7 @@ static GLFWbool createNativeWindow(_GLFWwindow* window,
         XFree(hint);
     }
 
-    // Announce support for Xdnd (drag and drop)
+    /* Announce support for Xdnd (drag and drop) */
     {
         const Atom version = _GLFW_XDND_VERSION;
         XChangeProperty(_glfw.x11.display, window->x11.handle,
@@ -794,14 +805,17 @@ static GLFWbool createNativeWindow(_GLFWwindow* window,
     return GLFW_TRUE;
 }
 
-// Set the specified property to the selection converted to the requested target
-//
+/* Set the specified property to the selection converted to the requested target
+ */
 static Atom writeTargetToProperty(const XSelectionRequestEvent* request)
 {
     int i;
     char* selectionString = NULL;
-    const Atom formats[] = { _glfw.x11.UTF8_STRING, XA_STRING };
+    Atom formats[2];
     const int formatCount = sizeof(formats) / sizeof(formats[0]);
+
+	formats[0] = _glfw.x11.UTF8_STRING;
+	formats[1] = XA_STRING;
 
     if (request->selection == _glfw.x11.PRIMARY)
         selectionString = _glfw.x11.primarySelectionString;
@@ -810,19 +824,20 @@ static Atom writeTargetToProperty(const XSelectionRequestEvent* request)
 
     if (request->property == None)
     {
-        // The requester is a legacy client (ICCCM section 2.2)
-        // We don't support legacy clients, so fail here
+        /* The requester is a legacy client (ICCCM section 2.2)
+         * We don't support legacy clients, so fail here */
         return None;
     }
 
     if (request->target == _glfw.x11.TARGETS)
     {
-        // The list of supported targets was requested
+        /* The list of supported targets was requested */
 
-        const Atom targets[] = { _glfw.x11.TARGETS,
-                                 _glfw.x11.MULTIPLE,
-                                 _glfw.x11.UTF8_STRING,
-                                 XA_STRING };
+        Atom targets[4];
+		targets[0] = _glfw.x11.TARGETS;
+		targets[1] = _glfw.x11.MULTIPLE;
+		targets[2] = _glfw.x11.UTF8_STRING;
+		targets[3] = XA_STRING;
 
         XChangeProperty(_glfw.x11.display,
                         request->requestor,
@@ -838,7 +853,7 @@ static Atom writeTargetToProperty(const XSelectionRequestEvent* request)
 
     if (request->target == _glfw.x11.MULTIPLE)
     {
-        // Multiple conversions were requested
+        /* Multiple conversions were requested */
 
         Atom* targets;
         unsigned long i, count;
@@ -889,8 +904,8 @@ static Atom writeTargetToProperty(const XSelectionRequestEvent* request)
 
     if (request->target == _glfw.x11.SAVE_TARGETS)
     {
-        // The request is a check whether we support SAVE_TARGETS
-        // It should be handled as a no-op side effect target
+        /* The request is a check whether we support SAVE_TARGETS
+         * It should be handled as a no-op side effect target */
 
         XChangeProperty(_glfw.x11.display,
                         request->requestor,
@@ -904,13 +919,13 @@ static Atom writeTargetToProperty(const XSelectionRequestEvent* request)
         return request->property;
     }
 
-    // Conversion to a data target was requested
+    /* Conversion to a data target was requested */
 
     for (i = 0;  i < formatCount;  i++)
     {
         if (request->target == formats[i])
         {
-            // The requested target is one we support
+            /* The requested target is one we support */
 
             XChangeProperty(_glfw.x11.display,
                             request->requestor,
@@ -925,7 +940,7 @@ static Atom writeTargetToProperty(const XSelectionRequestEvent* request)
         }
     }
 
-    // The requested target is not supported
+    /* The requested target is not supported */
 
     return None;
 }
@@ -962,8 +977,12 @@ static void handleSelectionRequest(XEvent* event)
 static const char* getSelectionString(Atom selection)
 {
     char** selectionString = NULL;
-    const Atom targets[] = { _glfw.x11.UTF8_STRING, XA_STRING };
+    Atom targets[2];
     const size_t targetCount = sizeof(targets) / sizeof(targets[0]);
+	size_t i;
+
+	targets[0] = _glfw.x11.UTF8_STRING;
+	targets[1] = XA_STRING;
 
     if (selection == _glfw.x11.PRIMARY)
         selectionString = &_glfw.x11.primarySelectionString;
@@ -973,15 +992,15 @@ static const char* getSelectionString(Atom selection)
     if (XGetSelectionOwner(_glfw.x11.display, selection) ==
         _glfw.x11.helperWindowHandle)
     {
-        // Instead of doing a large number of X round-trips just to put this
-        // string into a window property and then read it back, just return it
+        /* Instead of doing a large number of X round-trips just to put this
+         * string into a window property and then read it back, just return it */
         return *selectionString;
     }
 
     free(*selectionString);
     *selectionString = NULL;
 
-    for (size_t i = 0;  i < targetCount;  i++)
+    for (i = 0;  i < targetCount;  i++)
     {
         char* data;
         Atom actualType;
@@ -1099,20 +1118,20 @@ static const char* getSelectionString(Atom selection)
     return *selectionString;
 }
 
-// Make the specified window and its video mode active on its monitor
-//
+/* Make the specified window and its video mode active on its monitor
+ */
 static void acquireMonitor(_GLFWwindow* window)
 {
     if (_glfw.x11.saver.count == 0)
     {
-        // Remember old screen saver settings
+        /* Remember old screen saver settings */
         XGetScreenSaver(_glfw.x11.display,
                         &_glfw.x11.saver.timeout,
                         &_glfw.x11.saver.interval,
                         &_glfw.x11.saver.blanking,
                         &_glfw.x11.saver.exposure);
 
-        // Disable screen saver
+        /* Disable screen saver */
         XSetScreenSaver(_glfw.x11.display, 0, 0, DontPreferBlanking,
                         DefaultExposures);
     }
@@ -1127,7 +1146,7 @@ static void acquireMonitor(_GLFWwindow* window)
         int xpos, ypos;
         GLFWvidmode mode;
 
-        // Manually position the window over its monitor
+        /* Manually position the window over its monitor */
         _glfwPlatformGetMonitorPos(window->monitor, &xpos, &ypos);
         _glfwPlatformGetVideoMode(window->monitor, &mode);
 
@@ -1138,8 +1157,8 @@ static void acquireMonitor(_GLFWwindow* window)
     _glfwInputMonitorWindow(window->monitor, window);
 }
 
-// Remove the window and restore the original video mode
-//
+/* Remove the window and restore the original video mode
+ */
 static void releaseMonitor(_GLFWwindow* window)
 {
     if (window->monitor->window != window)
@@ -1152,7 +1171,7 @@ static void releaseMonitor(_GLFWwindow* window)
 
     if (_glfw.x11.saver.count == 0)
     {
-        // Restore old screen saver settings
+        /* Restore old screen saver settings */
         XSetScreenSaver(_glfw.x11.display,
                         _glfw.x11.saver.timeout,
                         _glfw.x11.saver.interval,
@@ -1161,14 +1180,15 @@ static void releaseMonitor(_GLFWwindow* window)
     }
 }
 
-// Process the specified X event
-//
+/* Process the specified X event
+ */
 static void processEvent(XEvent *event)
 {
     int keycode = 0;
     Bool filtered = False;
+    _GLFWwindow* window = NULL;
 
-    // HACK: Save scancode as some IMs clear the field in XFilterEvent
+    /* HACK: Save scancode as some IMs clear the field in XFilterEvent */
     if (event->type == KeyPress || event->type == KeyRelease)
         keycode = event->xkey.keycode;
 
@@ -1246,13 +1266,12 @@ static void processEvent(XEvent *event)
         return;
     }
 
-    _GLFWwindow* window = NULL;
     if (XFindContext(_glfw.x11.display,
                      event->xany.window,
                      _glfw.x11.context,
                      (XPointer*) &window) != 0)
     {
-        // This is an event for a window that has already been destroyed
+        /* This is an event for a window that has already been destroyed */
         return;
     }
 
@@ -1278,10 +1297,10 @@ static void processEvent(XEvent *event)
 
             if (window->x11.ic)
             {
-                // HACK: Ignore duplicate key press events generated by ibus
-                //       These have the same timestamp as the original event
-                //       Corresponding release events are filtered out
-                //       implicitly by the GLFW key repeat logic
+                /* HACK: Ignore duplicate key press events generated by ibus
+                 *       These have the same timestamp as the original event
+                 *       Corresponding release events are filtered out
+                 *       implicitly by the GLFW key repeat logic */
                 if (window->x11.lastKeyTime < event->xkey.time)
                 {
                     if (keycode)
@@ -1354,11 +1373,13 @@ static void processEvent(XEvent *event)
             else
             {
                 KeySym keysym;
+				long character;
+
                 XLookupString(&event->xkey, NULL, 0, &keysym, NULL);
 
                 _glfwInputKey(window, key, keycode, GLFW_PRESS, mods);
 
-                const long character = _glfwKeySym2Unicode(keysym);
+                character = _glfwKeySym2Unicode(keysym);
                 if (character != -1)
                     _glfwInputChar(window, character, mods, plain);
             }
@@ -1373,10 +1394,10 @@ static void processEvent(XEvent *event)
 
             if (!_glfw.x11.xkb.detectable)
             {
-                // HACK: Key repeat events will arrive as KeyRelease/KeyPress
-                //       pairs with similar or identical time stamps
-                //       The key repeat logic in _glfwInputKey expects only key
-                //       presses to repeat, so detect and discard release events
+                /* HACK: Key repeat events will arrive as KeyRelease/KeyPress
+                 *       pairs with similar or identical time stamps
+                 *       The key repeat logic in _glfwInputKey expects only key
+                 *       presses to repeat, so detect and discard release events */
                 if (XEventsQueued(_glfw.x11.display, QueuedAfterReading))
                 {
                     XEvent next;
@@ -1386,17 +1407,17 @@ static void processEvent(XEvent *event)
                         next.xkey.window == event->xkey.window &&
                         next.xkey.keycode == keycode)
                     {
-                        // HACK: The time of repeat events sometimes doesn't
-                        //       match that of the press event, so add an
-                        //       epsilon
-                        //       Toshiyuki Takahashi can press a button
-                        //       16 times per second so it's fairly safe to
-                        //       assume that no human is pressing the key 50
-                        //       times per second (value is ms)
+                        /* HACK: The time of repeat events sometimes doesn't
+                         *       match that of the press event, so add an
+                         *       epsilon
+                         *       Toshiyuki Takahashi can press a button
+                         *       16 times per second so it's fairly safe to
+                         *       assume that no human is pressing the key 50
+                         *       times per second (value is ms) */
                         if ((next.xkey.time - event->xkey.time) < 20)
                         {
-                            // This is very likely a server-generated key repeat
-                            // event, so ignore it
+                            /* This is very likely a server-generated key repeat
+                             * event, so ignore it */
                             return;
                         }
                     }
@@ -1418,7 +1439,7 @@ static void processEvent(XEvent *event)
             else if (event->xbutton.button == Button3)
                 _glfwInputMouseClick(window, GLFW_MOUSE_BUTTON_RIGHT, GLFW_PRESS, mods);
 
-            // Modern X provides scroll events as mouse button presses
+            /* Modern X provides scroll events as mouse button presses */
             else if (event->xbutton.button == Button4)
                 _glfwInputScroll(window, 0.0, 1.0);
             else if (event->xbutton.button == Button5)
@@ -1430,8 +1451,8 @@ static void processEvent(XEvent *event)
 
             else
             {
-                // Additional buttons after 7 are treated as regular buttons
-                // We subtract 4 to fill the gap left by scroll input above
+                /* Additional buttons after 7 are treated as regular buttons */
+                /* We subtract 4 to fill the gap left by scroll input above */
                 _glfwInputMouseClick(window,
                                      event->xbutton.button - Button1 - 4,
                                      GLFW_PRESS,
@@ -1468,8 +1489,8 @@ static void processEvent(XEvent *event)
             }
             else if (event->xbutton.button > Button7)
             {
-                // Additional buttons after 7 are treated as regular buttons
-                // We subtract 4 to fill the gap left by scroll input above
+                /* Additional buttons after 7 are treated as regular buttons */
+                /* We subtract 4 to fill the gap left by scroll input above */
                 _glfwInputMouseClick(window,
                                      event->xbutton.button - Button1 - 4,
                                      GLFW_RELEASE,
@@ -1481,12 +1502,12 @@ static void processEvent(XEvent *event)
 
         case EnterNotify:
         {
-            // XEnterWindowEvent is XCrossingEvent
+            /* XEnterWindowEvent is XCrossingEvent */
             const int x = event->xcrossing.x;
             const int y = event->xcrossing.y;
 
-            // HACK: This is a workaround for WMs (KWM, Fluxbox) that otherwise
-            //       ignore the defined cursor for hidden cursor mode
+            /* HACK: This is a workaround for WMs (KWM, Fluxbox) that otherwise
+             *       ignore the defined cursor for hidden cursor mode */
             if (window->cursorMode == GLFW_CURSOR_HIDDEN)
                 updateCursorImage(window);
 
@@ -1512,17 +1533,19 @@ static void processEvent(XEvent *event)
             if (x != window->x11.warpCursorPosX ||
                 y != window->x11.warpCursorPosY)
             {
-                // The cursor was moved by something other than GLFW
+                /* The cursor was moved by something other than GLFW */
 
                 if (window->cursorMode == GLFW_CURSOR_DISABLED)
                 {
+					int dx, dy;
+
                     if (_glfw.x11.disabledCursorWindow != window)
                         return;
                     if (window->rawMouseMotion)
                         return;
 
-                    const int dx = x - window->x11.lastCursorPosX;
-                    const int dy = y - window->x11.lastCursorPosY;
+                    dx = x - window->x11.lastCursorPosX;
+                    dy = y - window->x11.lastCursorPosY;
 
                     _glfwInputCursorPos(window,
                                         window->virtualCursorPosX + dx,
@@ -1539,6 +1562,8 @@ static void processEvent(XEvent *event)
 
         case ConfigureNotify:
         {
+			int xpos, ypos;
+
             if (event->xconfigure.width != window->x11.width ||
                 event->xconfigure.height != window->x11.height)
             {
@@ -1554,12 +1579,12 @@ static void processEvent(XEvent *event)
                 window->x11.height = event->xconfigure.height;
             }
 
-            int xpos = event->xconfigure.x;
-            int ypos = event->xconfigure.y;
+            xpos = event->xconfigure.x;
+            ypos = event->xconfigure.y;
 
-            // NOTE: ConfigureNotify events from the server are in local
-            //       coordinates, so if we are reparented we need to translate
-            //       the position into root (screen) coordinates
+            /* NOTE: ConfigureNotify events from the server are in local
+             *       coordinates, so if we are reparented we need to translate
+             *       the position into root (screen) coordinates */
             if (!event->xany.send_event && window->x11.parent != _glfw.x11.root)
             {
                 Window dummy;
@@ -1583,7 +1608,7 @@ static void processEvent(XEvent *event)
 
         case ClientMessage:
         {
-            // Custom client message, probably from the window manager
+            /* Custom client message, probably from the window manager */
 
             if (filtered)
                 return;
@@ -1599,15 +1624,15 @@ static void processEvent(XEvent *event)
 
                 if (protocol == _glfw.x11.WM_DELETE_WINDOW)
                 {
-                    // The window manager was asked to close the window, for
-                    // example by the user pressing a 'close' window decoration
-                    // button
+                    /* The window manager was asked to close the window, for
+                     * example by the user pressing a 'close' window decoration
+                     * button */
                     _glfwInputWindowCloseRequest(window);
                 }
                 else if (protocol == _glfw.x11.NET_WM_PING)
                 {
-                    // The window manager is pinging the application to ensure
-                    // it's still responding to events
+                    /* The window manager is pinging the application to ensure
+                     * it's still responding to events */
 
                     XEvent reply = *event;
                     reply.xclient.window = _glfw.x11.root;
@@ -1620,7 +1645,7 @@ static void processEvent(XEvent *event)
             }
             else if (event->xclient.message_type == _glfw.x11.XdndEnter)
             {
-                // A drag operation has entered the window
+                /* A drag operation has entered the window */
                 unsigned long i, count;
                 Atom* formats = NULL;
                 const GLFWbool list = event->xclient.data.l[1] & 1;
@@ -1659,7 +1684,7 @@ static void processEvent(XEvent *event)
             }
             else if (event->xclient.message_type == _glfw.x11.XdndDrop)
             {
-                // The drag operation has finished by dropping on the window
+                /* The drag operation has finished by dropping on the window */
                 Time time = CurrentTime;
 
                 if (_glfw.x11.xdnd.version > _GLFW_XDND_VERSION)
@@ -1670,7 +1695,7 @@ static void processEvent(XEvent *event)
                     if (_glfw.x11.xdnd.version >= 1)
                         time = event->xclient.data.l[2];
 
-                    // Request the chosen format from the source window
+                    /* Request the chosen format from the source window */
                     XConvertSelection(_glfw.x11.display,
                                       _glfw.x11.XdndSelection,
                                       _glfw.x11.xdnd.format,
@@ -1685,7 +1710,7 @@ static void processEvent(XEvent *event)
                     reply.xclient.message_type = _glfw.x11.XdndFinished;
                     reply.xclient.format = 32;
                     reply.xclient.data.l[0] = window->x11.handle;
-                    reply.xclient.data.l[1] = 0; // The drag was rejected
+                    reply.xclient.data.l[1] = 0; /* The drag was rejected */
                     reply.xclient.data.l[2] = None;
 
                     XSendEvent(_glfw.x11.display, _glfw.x11.xdnd.source,
@@ -1695,11 +1720,12 @@ static void processEvent(XEvent *event)
             }
             else if (event->xclient.message_type == _glfw.x11.XdndPosition)
             {
-                // The drag operation has moved over the window
+                /* The drag operation has moved over the window */
                 const int xabs = (event->xclient.data.l[2] >> 16) & 0xffff;
                 const int yabs = (event->xclient.data.l[2]) & 0xffff;
                 Window dummy;
                 int xpos, ypos;
+                XEvent reply = { ClientMessage };
 
                 if (_glfw.x11.xdnd.version > _GLFW_XDND_VERSION)
                     return;
@@ -1713,18 +1739,17 @@ static void processEvent(XEvent *event)
 
                 _glfwInputCursorPos(window, xpos, ypos);
 
-                XEvent reply = { ClientMessage };
                 reply.xclient.window = _glfw.x11.xdnd.source;
                 reply.xclient.message_type = _glfw.x11.XdndStatus;
                 reply.xclient.format = 32;
                 reply.xclient.data.l[0] = window->x11.handle;
-                reply.xclient.data.l[2] = 0; // Specify an empty rectangle
+                reply.xclient.data.l[2] = 0; /* Specify an empty rectangle */
                 reply.xclient.data.l[3] = 0;
 
                 if (_glfw.x11.xdnd.format)
                 {
-                    // Reply that we are ready to copy the dragged data
-                    reply.xclient.data.l[1] = 1; // Accept with no rectangle
+                    /* Reply that we are ready to copy the dragged data */
+                    reply.xclient.data.l[1] = 1; /* Accept with no rectangle */
                     if (_glfw.x11.xdnd.version >= 2)
                         reply.xclient.data.l[4] = _glfw.x11.XdndActionCopy;
                 }
@@ -1741,7 +1766,7 @@ static void processEvent(XEvent *event)
         {
             if (event->xselection.property == _glfw.x11.XdndSelection)
             {
-                // The converted data from the drag operation has arrived
+                /* The converted data from the drag operation has arrived */
                 char* data;
                 const unsigned long result =
                     _glfwGetWindowPropertyX11(event->xselection.requestor,
@@ -1788,8 +1813,8 @@ static void processEvent(XEvent *event)
             if (event->xfocus.mode == NotifyGrab ||
                 event->xfocus.mode == NotifyUngrab)
             {
-                // Ignore focus events from popup indicator windows, window menu
-                // key chords and window dragging
+                /* Ignore focus events from popup indicator windows, window menu
+                 * key chords and window dragging */
                 return;
             }
 
@@ -1808,8 +1833,8 @@ static void processEvent(XEvent *event)
             if (event->xfocus.mode == NotifyGrab ||
                 event->xfocus.mode == NotifyUngrab)
             {
-                // Ignore focus events from popup indicator windows, window menu
-                // key chords and window dragging
+                /* Ignore focus events from popup indicator windows, window menu
+                 * key chords and window dragging */
                 return;
             }
 
@@ -1839,11 +1864,13 @@ static void processEvent(XEvent *event)
 
             if (event->xproperty.atom == _glfw.x11.WM_STATE)
             {
+				GLFWbool iconified;
                 const int state = getWindowState(window);
+
                 if (state != IconicState && state != NormalState)
                     return;
 
-                const GLFWbool iconified = (state == IconicState);
+                iconified = (state == IconicState);
                 if (window->x11.iconified != iconified)
                 {
                     if (window->monitor)
@@ -1877,13 +1904,13 @@ static void processEvent(XEvent *event)
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                       GLFW internal API                      /// */
+/* //////////////////////////////////////////////////////////////////// */
 
-// Retrieve a single window property of the specified type
-// Inspired by fghGetWindowProperty from freeglut
-//
+/* Retrieve a single window property of the specified type
+ * Inspired by fghGetWindowProperty from freeglut
+ */
 unsigned long _glfwGetWindowPropertyX11(Window window,
                                         Atom property,
                                         Atom type,
@@ -1911,15 +1938,17 @@ unsigned long _glfwGetWindowPropertyX11(Window window,
 
 GLFWbool _glfwIsVisualTransparentX11(Visual* visual)
 {
+	XRenderPictFormat* pf;
+
     if (!_glfw.x11.xrender.available)
         return GLFW_FALSE;
 
-    XRenderPictFormat* pf = XRenderFindVisualFormat(_glfw.x11.display, visual);
+    pf = XRenderFindVisualFormat(_glfw.x11.display, visual);
     return pf && pf->direct.alphaMask;
 }
 
-// Push contents of our selection to clipboard manager
-//
+/* Push contents of our selection to clipboard manager
+ */
 void _glfwPushSelectionToManagerX11(void)
 {
     XConvertSelection(_glfw.x11.display,
@@ -1949,11 +1978,11 @@ void _glfwPushSelectionToManagerX11(void)
                 {
                     if (event.xselection.target == _glfw.x11.SAVE_TARGETS)
                     {
-                        // This means one of two things; either the selection
-                        // was not owned, which means there is no clipboard
-                        // manager, or the transfer to the clipboard manager has
-                        // completed
-                        // In either case, it means we are done here
+                        /* This means one of two things; either the selection
+                         * was not owned, which means there is no clipboard
+                         * manager, or the transfer to the clipboard manager has
+                         * completed
+                         * In either case, it means we are done here */
                         return;
                     }
 
@@ -1967,9 +1996,16 @@ void _glfwPushSelectionToManagerX11(void)
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW platform API                      //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                       GLFW platform API                      /// */
+/* //////////////////////////////////////////////////////////////////// */
+
+dlsymret *_glfw_dlsym(void *handle, const char *procname)
+{
+	dlsymret *fptr;
+	*(void **)(&fptr) = dlsym(handle, procname);
+	return fptr;
+}
 
 int _glfwPlatformCreateWindow(_GLFWwindow* window,
                               const _GLFWwndconfig* wndconfig,
@@ -2085,8 +2121,8 @@ void _glfwPlatformSetWindowTitle(_GLFWwindow* window, const char* title)
                          NULL, 0,
                          NULL, NULL, NULL);
 #else
-    // This may be a slightly better fallback than using XStoreName and
-    // XSetIconName, which always store their arguments using STRING
+    /* This may be a slightly better fallback than using XStoreName and
+     */ XSetIconName, which always store their arguments using STRING
     XmbSetWMProperties(_glfw.x11.display,
                        window->x11.handle,
                        title, title,
@@ -2113,12 +2149,14 @@ void _glfwPlatformSetWindowIcon(_GLFWwindow* window,
     if (count)
     {
         int i, j, longCount = 0;
+		long* icon;
+		long* target;
 
         for (i = 0;  i < count;  i++)
             longCount += 2 + images[i].width * images[i].height;
 
-        long* icon = calloc(longCount, sizeof(long));
-        long* target = icon;
+        icon = calloc(longCount, sizeof(long));
+        target = icon;
 
         for (i = 0;  i < count;  i++)
         {
@@ -2168,8 +2206,8 @@ void _glfwPlatformGetWindowPos(_GLFWwindow* window, int* xpos, int* ypos)
 
 void _glfwPlatformSetWindowPos(_GLFWwindow* window, int xpos, int ypos)
 {
-    // HACK: Explicitly setting PPosition to any value causes some WMs, notably
-    //       Compiz and Metacity, to honor the position of unmapped windows
+    /* HACK: Explicitly setting PPosition to any value causes some WMs, notably
+     *       Compiz and Metacity, to honor the position of unmapped windows */
     if (!_glfwPlatformWindowVisible(window))
     {
         long supplied;
@@ -2260,16 +2298,16 @@ void _glfwPlatformGetWindowFrameSize(_GLFWwindow* window,
         XEvent event;
         double timeout = 0.5;
 
-        // Ensure _NET_FRAME_EXTENTS is set, allowing glfwGetWindowFrameSize to
-        // function before the window is mapped
+        /* Ensure _NET_FRAME_EXTENTS is set, allowing glfwGetWindowFrameSize to
+         * function before the window is mapped */
         sendEventToWM(window, _glfw.x11.NET_REQUEST_FRAME_EXTENTS,
                       0, 0, 0, 0, 0);
 
-        // HACK: Use a timeout because earlier versions of some window managers
-        //       (at least Unity, Fluxbox and Xfwm) failed to send the reply
-        //       They have been fixed but broken versions are still in the wild
-        //       If you are affected by this and your window manager is NOT
-        //       listed above, PLEASE report it to their and our issue trackers
+        /* HACK: Use a timeout because earlier versions of some window managers
+         *       (at least Unity, Fluxbox and Xfwm) failed to send the reply
+         *       They have been fixed but broken versions are still in the wild
+         *       If you are affected by this and your window manager is NOT
+         *       listed above, PLEASE report it to their and our issue trackers */
         while (!XCheckIfEvent(_glfw.x11.display,
                               &event,
                               isFrameExtentsEvent,
@@ -2316,8 +2354,8 @@ void _glfwPlatformIconifyWindow(_GLFWwindow* window)
 {
     if (window->x11.overrideRedirect)
     {
-        // Override-redirect windows cannot be iconified or restored, as those
-        // tasks are performed by the window manager
+        /* Override-redirect windows cannot be iconified or restored, as those
+         * tasks are performed by the window manager */
         _glfwInputError(GLFW_PLATFORM_ERROR,
                         "X11: Iconification of full screen windows requires a WM that supports EWMH full screen");
         return;
@@ -2331,8 +2369,8 @@ void _glfwPlatformRestoreWindow(_GLFWwindow* window)
 {
     if (window->x11.overrideRedirect)
     {
-        // Override-redirect windows cannot be iconified or restored, as those
-        // tasks are performed by the window manager
+        /* Override-redirect windows cannot be iconified or restored, as those
+         * tasks are performed by the window manager */
         _glfwInputError(GLFW_PLATFORM_ERROR,
                         "X11: Iconification of full screen windows requires a WM that supports EWMH full screen");
         return;
@@ -2387,20 +2425,19 @@ void _glfwPlatformMaximizeWindow(_GLFWwindow* window)
                                       _glfw.x11.NET_WM_STATE,
                                       XA_ATOM,
                                       (unsigned char**) &states);
-
-        // NOTE: We don't check for failure as this property may not exist yet
-        //       and that's fine (and we'll create it implicitly with append)
-
-        Atom missing[2] =
-        {
-            _glfw.x11.NET_WM_STATE_MAXIMIZED_VERT,
-            _glfw.x11.NET_WM_STATE_MAXIMIZED_HORZ
-        };
+		Atom missing[2];
         unsigned long missingCount = 2;
+		unsigned long i, j;
 
-        for (unsigned long i = 0;  i < count;  i++)
+        /* NOTE: We don't check for failure as this property may not exist yet
+         *       and that's fine (and we'll create it implicitly with append) */
+
+        missing[0] = _glfw.x11.NET_WM_STATE_MAXIMIZED_VERT;
+		missing[1] = _glfw.x11.NET_WM_STATE_MAXIMIZED_HORZ;
+
+        for (i = 0;  i < count;  i++)
         {
-            for (unsigned long j = 0;  j < missingCount;  j++)
+            for (j = 0;  j < missingCount;  j++)
             {
                 if (states[i] == missing[j])
                 {
@@ -2546,6 +2583,7 @@ int _glfwPlatformWindowMaximized(_GLFWwindow* window)
     Atom* states;
     unsigned long i;
     GLFWbool maximized = GLFW_FALSE;
+	unsigned long count;
 
     if (!_glfw.x11.NET_WM_STATE ||
         !_glfw.x11.NET_WM_STATE_MAXIMIZED_VERT ||
@@ -2554,11 +2592,10 @@ int _glfwPlatformWindowMaximized(_GLFWwindow* window)
         return maximized;
     }
 
-    const unsigned long count =
-        _glfwGetWindowPropertyX11(window->x11.handle,
-                                  _glfw.x11.NET_WM_STATE,
-                                  XA_ATOM,
-                                  (unsigned char**) &states);
+    count = _glfwGetWindowPropertyX11(window->x11.handle,
+                                      _glfw.x11.NET_WM_STATE,
+                                      XA_ATOM,
+                                      (unsigned char**) &states);
 
     for (i = 0;  i < count;  i++)
     {
@@ -2659,8 +2696,8 @@ void _glfwPlatformSetWindowFloating(_GLFWwindow* window, GLFWbool enabled)
                                           XA_ATOM,
                                           (unsigned char**) &states);
 
-        // NOTE: We don't check for failure as this property may not exist yet
-        //       and that's fine (and we'll create it implicitly with append)
+        /* NOTE: We don't check for failure as this property may not exist yet
+         *       and that's fine (and we'll create it implicitly with append) */
 
         if (enabled)
         {
@@ -2777,8 +2814,8 @@ void _glfwPlatformPollEvents(void)
         int width, height;
         _glfwPlatformGetWindowSize(window, &width, &height);
 
-        // NOTE: Re-center the cursor only if it has moved since the last call,
-        //       to avoid breaking glfwWaitEvents with MotionNotify
+        /* NOTE: Re-center the cursor only if it has moved since the last call,
+         *       to avoid breaking glfwWaitEvents with MotionNotify */
         if (window->x11.lastCursorPosX != width / 2 ||
             window->x11.lastCursorPosY != height / 2)
         {
@@ -2812,7 +2849,7 @@ void _glfwPlatformPostEmptyEvent(void)
 {
     XEvent event = { ClientMessage };
     event.xclient.window = _glfw.x11.helperWindowHandle;
-    event.xclient.format = 32; // Data is 32-bit longs
+    event.xclient.format = 32; /* Data is 32-bit longs */
     event.xclient.message_type = _glfw.x11.NULL_;
 
     XSendEvent(_glfw.x11.display, _glfw.x11.helperWindowHandle, False, 0, &event);
@@ -2838,7 +2875,7 @@ void _glfwPlatformGetCursorPos(_GLFWwindow* window, double* xpos, double* ypos)
 
 void _glfwPlatformSetCursorPos(_GLFWwindow* window, double x, double y)
 {
-    // Store the new position so it can be recognized later
+    /* Store the new position so it can be recognized later */
     window->x11.warpCursorPosX = (int) x;
     window->x11.warpCursorPosY = (int) y;
 
@@ -2864,20 +2901,24 @@ void _glfwPlatformSetCursorMode(_GLFWwindow* window, int mode)
 
 const char* _glfwPlatformGetScancodeName(int scancode)
 {
+	int key;
+	KeySym keysym;
+	long ch;
+	size_t count;
+
     if (!_glfw.x11.xkb.available)
         return NULL;
 
-    const int key = _glfw.x11.keycodes[scancode];
-    const KeySym keysym = XkbKeycodeToKeysym(_glfw.x11.display,
-                                             scancode, _glfw.x11.xkb.group, 0);
+    key = _glfw.x11.keycodes[scancode];
+    keysym = XkbKeycodeToKeysym(_glfw.x11.display, scancode, _glfw.x11.xkb.group, 0);
     if (keysym == NoSymbol)
         return NULL;
 
-    const long ch = _glfwKeySym2Unicode(keysym);
+    ch = _glfwKeySym2Unicode(keysym);
     if (ch == -1)
         return NULL;
 
-    const size_t count = encodeUTF8(_glfw.x11.keynames[key], (unsigned int) ch);
+    count = encodeUTF8(_glfw.x11.keynames[key], (unsigned int) ch);
     if (count == 0)
         return NULL;
 
@@ -2910,6 +2951,7 @@ int _glfwPlatformCreateStandardCursor(_GLFWcursor* cursor, int shape)
         {
             const int size = XcursorGetDefaultSize(_glfw.x11.display);
             const char* name = NULL;
+			XcursorImage* image;
 
             if (shape == GLFW_ARROW_CURSOR)
                 name = "default";
@@ -2932,7 +2974,7 @@ int _glfwPlatformCreateStandardCursor(_GLFWcursor* cursor, int shape)
             else if (shape == GLFW_NOT_ALLOWED_CURSOR)
                 name = "not-allowed";
 
-            XcursorImage* image = XcursorLibraryLoadImage(name, theme, size);
+            image = XcursorLibraryLoadImage(name, theme, size);
             if (image)
             {
                 cursor->x11.handle = XcursorImageLoadCursor(_glfw.x11.display, image);
@@ -3029,8 +3071,8 @@ void _glfwPlatformGetRequiredInstanceExtensions(char** extensions)
 
     extensions[0] = "VK_KHR_surface";
 
-    // NOTE: VK_KHR_xcb_surface is preferred due to some early ICDs exposing but
-    //       not correctly implementing VK_KHR_xlib_surface
+    /* NOTE: VK_KHR_xcb_surface is preferred due to some early ICDs exposing but
+     *       not correctly implementing VK_KHR_xlib_surface */
     if (_glfw.vk.KHR_xcb_surface && _glfw.x11.x11xcb.handle)
         extensions[1] = "VK_KHR_xcb_surface";
     else
@@ -3046,6 +3088,8 @@ int _glfwPlatformGetPhysicalDevicePresentationSupport(VkInstance instance,
 
     if (_glfw.vk.KHR_xcb_surface && _glfw.x11.x11xcb.handle)
     {
+		xcb_connection_t* connection;
+
         PFN_vkGetPhysicalDeviceXcbPresentationSupportKHR
             vkGetPhysicalDeviceXcbPresentationSupportKHR =
             (PFN_vkGetPhysicalDeviceXcbPresentationSupportKHR)
@@ -3057,7 +3101,7 @@ int _glfwPlatformGetPhysicalDevicePresentationSupport(VkInstance instance,
             return GLFW_FALSE;
         }
 
-        xcb_connection_t* connection = XGetXCBConnection(_glfw.x11.display);
+        connection = XGetXCBConnection(_glfw.x11.display);
         if (!connection)
         {
             _glfwInputError(GLFW_PLATFORM_ERROR,
@@ -3166,9 +3210,9 @@ VkResult _glfwPlatformCreateWindowSurface(VkInstance instance,
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                        GLFW native API                       //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                        GLFW native API                       /// */
+/* //////////////////////////////////////////////////////////////////// */
 
 GLFWAPI Display* glfwGetX11Display(void)
 {

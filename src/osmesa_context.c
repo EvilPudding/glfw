@@ -1,3 +1,4 @@
+/*
 //========================================================================
 // GLFW 3.4 OSMesa - www.glfw.org
 //------------------------------------------------------------------------
@@ -26,6 +27,7 @@
 //========================================================================
 // Please use C89 style variable declarations in this file because VS 2010
 //========================================================================
+*/
 
 #include <stdlib.h>
 #include <string.h>
@@ -41,14 +43,14 @@ static void makeContextCurrentOSMesa(_GLFWwindow* window)
         int width, height;
         _glfwPlatformGetFramebufferSize(window, &width, &height);
 
-        // Check to see if we need to allocate a new buffer
+        /* Check to see if we need to allocate a new buffer */
         if ((window->context.osmesa.buffer == NULL) ||
             (width != window->context.osmesa.width) ||
             (height != window->context.osmesa.height))
         {
             free(window->context.osmesa.buffer);
 
-            // Allocate the new buffer (width * height * 8-bit RGBA)
+            /* Allocate the new buffer (width * height * 8-bit RGBA) */
             window->context.osmesa.buffer = calloc(4, (size_t) width * height);
             window->context.osmesa.width  = width;
             window->context.osmesa.height = height;
@@ -91,24 +93,24 @@ static void destroyContextOSMesa(_GLFWwindow* window)
 
 static void swapBuffersOSMesa(_GLFWwindow* window)
 {
-    // No double buffering on OSMesa
+    /* No double buffering on OSMesa */
 }
 
 static void swapIntervalOSMesa(int interval)
 {
-    // No swap interval on OSMesa
+    /* No swap interval on OSMesa */
 }
 
 static int extensionSupportedOSMesa(const char* extension)
 {
-    // OSMesa does not have extensions
+    /* OSMesa does not have extensions */
     return GLFW_FALSE;
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                       GLFW internal API                      /// */
+/* //////////////////////////////////////////////////////////////////// */
 
 GLFWbool _glfwInitOSMesa(void)
 {
@@ -288,9 +290,9 @@ GLFWbool _glfwCreateContextOSMesa(_GLFWwindow* window,
 #undef setAttrib
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                        GLFW native API                       //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                        GLFW native API                       /// */
+/* //////////////////////////////////////////////////////////////////// */
 
 GLFWAPI int glfwGetOSMesaColorBuffer(GLFWwindow* handle, int* width,
                                      int* height, int* format, void** buffer)

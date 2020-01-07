@@ -1,3 +1,4 @@
+/*
 //========================================================================
 // GLFW 3.4 Linux - www.glfw.org
 //------------------------------------------------------------------------
@@ -23,6 +24,7 @@
 //    distribution.
 //
 //========================================================================
+*/
 
 #include <linux/input.h>
 #include <linux/limits.h>
@@ -33,8 +35,8 @@
 
 #define _GLFW_PLATFORM_MAPPING_NAME "Linux"
 
-// Linux-specific joystick data
-//
+/* Linux-specific joystick data
+ */
 typedef struct _GLFWjoystickLinux
 {
     int                     fd;
@@ -45,8 +47,8 @@ typedef struct _GLFWjoystickLinux
     int                     hats[4][2];
 } _GLFWjoystickLinux;
 
-// Linux-specific joystick API data
-//
+/* Linux-specific joystick API data
+ */
 typedef struct _GLFWlibraryLinux
 {
     int                     inotify;

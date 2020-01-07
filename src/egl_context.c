@@ -1,3 +1,4 @@
+/*
 //========================================================================
 // GLFW 3.4 EGL - www.glfw.org
 //------------------------------------------------------------------------
@@ -26,6 +27,7 @@
 //========================================================================
 // Please use C89 style variable declarations in this file because VS 2010
 //========================================================================
+*/
 
 #include "internal.h"
 
@@ -35,8 +37,8 @@
 #include <assert.h>
 
 
-// Return a description of the specified EGL error
-//
+/* Return a description of the specified EGL error
+ */
 static const char* getEGLErrorString(EGLint error)
 {
     switch (error)
@@ -76,8 +78,8 @@ static const char* getEGLErrorString(EGLint error)
     }
 }
 
-// Returns the specified attribute of the specified EGLConfig
-//
+/* Returns the specified attribute of the specified EGLConfig
+ */
 static int getEGLConfigAttrib(EGLConfig config, int attrib)
 {
     int value;
@@ -85,8 +87,8 @@ static int getEGLConfigAttrib(EGLConfig config, int attrib)
     return value;
 }
 
-// Return the EGLConfig most closely matching the specified hints
-//
+/* Return the EGLConfig most closely matching the specified hints
+ */
 static GLFWbool chooseEGLConfig(const _GLFWctxconfig* ctxconfig,
                                 const _GLFWfbconfig* desired,
                                 EGLConfig* result)
@@ -114,11 +116,11 @@ static GLFWbool chooseEGLConfig(const _GLFWctxconfig* ctxconfig,
         const EGLConfig n = nativeConfigs[i];
         _GLFWfbconfig* u = usableConfigs + usableCount;
 
-        // Only consider RGB(A) EGLConfigs
+        /* Only consider RGB(A) EGLConfigs */
         if (getEGLConfigAttrib(n, EGL_COLOR_BUFFER_TYPE) != EGL_RGB_BUFFER)
             continue;
 
-        // Only consider window EGLConfigs
+        /* Only consider window EGLConfigs */
         if (!(getEGLConfigAttrib(n, EGL_SURFACE_TYPE) & EGL_WINDOW_BIT))
             continue;
 
@@ -126,7 +128,7 @@ static GLFWbool chooseEGLConfig(const _GLFWctxconfig* ctxconfig,
         {
             XVisualInfo vi = {0};
 
-            // Only consider EGLConfigs with associated Visuals
+            /* Only consider EGLConfigs with associated Visuals */
             vi.visualid = getEGLConfigAttrib(n, EGL_NATIVE_VISUAL_ID);
             if (!vi.visualid)
                 continue;
@@ -143,7 +145,7 @@ static GLFWbool chooseEGLConfig(const _GLFWctxconfig* ctxconfig,
                 }
             }
         }
-#endif // _GLFW_X11
+#endif /* _GLFW_X11 */
 
         if (ctxconfig->client == GLFW_OPENGL_ES_API)
         {
@@ -268,10 +270,10 @@ static GLFWglproc getProcAddressEGL(const char* procname)
 static void destroyContextEGL(_GLFWwindow* window)
 {
 #if defined(_GLFW_X11)
-    // NOTE: Do not unload libGL.so.1 while the X11 display is still open,
-    //       as it will make XCloseDisplay segfault
+    /* NOTE: Do not unload libGL.so.1 while the X11 display is still open,
+     *       as it will make XCloseDisplay segfault */
     if (window->context.client != GLFW_OPENGL_API)
-#endif // _GLFW_X11
+#endif /* _GLFW_X11 */
     {
         if (window->context.egl.client)
         {
@@ -294,12 +296,12 @@ static void destroyContextEGL(_GLFWwindow* window)
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                       GLFW internal API                      /// */
+/* //////////////////////////////////////////////////////////////////// */
 
-// Initialize EGL
-//
+/* Initialize EGL
+ */
 GLFWbool _glfwInitEGL(void)
 {
     int i;
@@ -430,8 +432,8 @@ GLFWbool _glfwInitEGL(void)
     return GLFW_TRUE;
 }
 
-// Terminate EGL
-//
+/* Terminate EGL
+ */
 void _glfwTerminateEGL(void)
 {
     if (_glfw.egl.display)
@@ -454,8 +456,8 @@ void _glfwTerminateEGL(void)
     attribs[index++] = v; \
 }
 
-// Create the OpenGL or OpenGL ES context
-//
+/* Create the OpenGL or OpenGL ES context
+ */
 GLFWbool _glfwCreateContextEGL(_GLFWwindow* window,
                                const _GLFWctxconfig* ctxconfig,
                                const _GLFWfbconfig* fbconfig)
@@ -587,7 +589,7 @@ GLFWbool _glfwCreateContextEGL(_GLFWwindow* window,
         return GLFW_FALSE;
     }
 
-    // Set up attributes for surface creation
+    /* Set up attributes for surface creation */
     {
         int index = 0;
 
@@ -615,7 +617,7 @@ GLFWbool _glfwCreateContextEGL(_GLFWwindow* window,
 
     window->context.egl.config = config;
 
-    // Load the appropriate client library
+    /* Load the appropriate client library */
     if (!_glfw.egl.KHR_get_all_proc_addresses)
     {
         int i;
@@ -675,8 +677,8 @@ GLFWbool _glfwCreateContextEGL(_GLFWwindow* window,
 
         for (i = 0;  sonames[i];  i++)
         {
-            // HACK: Match presence of lib prefix to increase chance of finding
-            //       a matching pair in the jungle that is Win32 EGL/GLES
+            /* HACK: Match presence of lib prefix to increase chance of finding
+             *       a matching pair in the jungle that is Win32 EGL/GLES */
             if (_glfw.egl.prefix != (strncmp(sonames[i], "lib", 3) == 0))
                 continue;
 
@@ -705,8 +707,8 @@ GLFWbool _glfwCreateContextEGL(_GLFWwindow* window,
 
 #undef setAttrib
 
-// Returns the Visual and depth of the chosen EGLConfig
-//
+/* Returns the Visual and depth of the chosen EGLConfig
+ */
 #if defined(_GLFW_X11)
 GLFWbool _glfwChooseVisualEGL(const _GLFWwndconfig* wndconfig,
                               const _GLFWctxconfig* ctxconfig,
@@ -746,12 +748,12 @@ GLFWbool _glfwChooseVisualEGL(const _GLFWwndconfig* wndconfig,
     XFree(result);
     return GLFW_TRUE;
 }
-#endif // _GLFW_X11
+#endif /* _GLFW_X11 */
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                        GLFW native API                       //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                        GLFW native API                       /// */
+/* //////////////////////////////////////////////////////////////////// */
 
 GLFWAPI EGLDisplay glfwGetEGLDisplay(void)
 {

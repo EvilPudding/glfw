@@ -1,3 +1,4 @@
+/*
 //========================================================================
 // GLFW 3.4 X11 - www.glfw.org
 //------------------------------------------------------------------------
@@ -26,6 +27,7 @@
 //========================================================================
 // It is fine to use C99 in this file because it will not be built with VS
 //========================================================================
+*/
 
 #include "internal.h"
 
@@ -62,9 +64,9 @@
  */
 
 
-//************************************************************************
-//****                KeySym to Unicode mapping table                 ****
-//************************************************************************
+/*************************************************************************/
+/*****                KeySym to Unicode mapping table                 ****/
+/*************************************************************************/
 
 static const struct codepair {
   unsigned short keysym;
@@ -854,16 +856,16 @@ static const struct codepair {
   { 0xfe6a, 0x02f7 },
   { 0xfe6e,    ',' },
   { 0xfe6f, 0x00a4 },
-  { 0xfe80,    'a' }, // XK_dead_a
-  { 0xfe81,    'A' }, // XK_dead_A
-  { 0xfe82,    'e' }, // XK_dead_e
-  { 0xfe83,    'E' }, // XK_dead_E
-  { 0xfe84,    'i' }, // XK_dead_i
-  { 0xfe85,    'I' }, // XK_dead_I
-  { 0xfe86,    'o' }, // XK_dead_o
-  { 0xfe87,    'O' }, // XK_dead_O
-  { 0xfe88,    'u' }, // XK_dead_u
-  { 0xfe89,    'U' }, // XK_dead_U
+  { 0xfe80,    'a' }, /* XK_dead_a */
+  { 0xfe81,    'A' }, /* XK_dead_A */
+  { 0xfe82,    'e' }, /* XK_dead_e */
+  { 0xfe83,    'E' }, /* XK_dead_E */
+  { 0xfe84,    'i' }, /* XK_dead_i */
+  { 0xfe85,    'I' }, /* XK_dead_I */
+  { 0xfe86,    'o' }, /* XK_dead_o */
+  { 0xfe87,    'O' }, /* XK_dead_O */
+  { 0xfe88,    'u' }, /* XK_dead_u */
+  { 0xfe89,    'U' }, /* XK_dead_U */
   { 0xfe8a, 0x0259 },
   { 0xfe8b, 0x018f },
   { 0xfe8c, 0x00b5 },
@@ -901,30 +903,30 @@ static const struct codepair {
 };
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////// */
+/* ///                       GLFW internal API                      /// */
+/* //////////////////////////////////////////////////////////////////// */
 
-// Convert XKB KeySym to Unicode
-//
+/* Convert XKB KeySym to Unicode
+ */
 long _glfwKeySym2Unicode(unsigned int keysym)
 {
     int min = 0;
     int max = sizeof(keysymtab) / sizeof(struct codepair) - 1;
     int mid;
 
-    // First check for Latin-1 characters (1:1 mapping)
+    /* First check for Latin-1 characters (1:1 mapping) */
     if ((keysym >= 0x0020 && keysym <= 0x007e) ||
         (keysym >= 0x00a0 && keysym <= 0x00ff))
     {
         return keysym;
     }
 
-    // Also check for directly encoded 24-bit UCS characters
+    /* Also check for directly encoded 24-bit UCS characters */
     if ((keysym & 0xff000000) == 0x01000000)
         return keysym & 0x00ffffff;
 
-    // Binary search in table
+    /* Binary search in table */
     while (max >= min)
     {
         mid = (min + max) / 2;
@@ -936,7 +938,7 @@ long _glfwKeySym2Unicode(unsigned int keysym)
             return keysymtab[mid].ucs;
     }
 
-    // No matching Unicode value found
+    /* No matching Unicode value found */
     return -1;
 }
 

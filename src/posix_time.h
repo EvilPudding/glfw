@@ -1,3 +1,4 @@
+/*
 //========================================================================
 // GLFW 3.4 POSIX - www.glfw.org
 //------------------------------------------------------------------------
@@ -24,14 +25,15 @@
 //    distribution.
 //
 //========================================================================
+*/
 
 #define _GLFW_PLATFORM_LIBRARY_TIMER_STATE _GLFWtimerPOSIX posix
 
 #include <stdint.h>
 
 
-// POSIX-specific global timer data
-//
+/* POSIX-specific global timer data
+ */
 typedef struct _GLFWtimerPOSIX
 {
     GLFWbool    monotonic;
