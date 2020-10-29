@@ -1266,6 +1266,7 @@ static void processEvent(XEvent *event)
         return;
     }
 
+    window = NULL;
     if (XFindContext(_glfw.x11.display,
                      event->xany.window,
                      _glfw.x11.context,

@@ -119,21 +119,11 @@ information on what to include when reporting a bug.
 
 ## Changelog
 
- - Added `GLFW_RESIZE_NWSE_CURSOR`, `GLFW_RESIZE_NESW_CURSOR`,
-   `GLFW_RESIZE_ALL_CURSOR` and `GLFW_NOT_ALLOWED_CURSOR` cursor shapes (#427)
- - Added `GLFW_RESIZE_EW_CURSOR` alias for `GLFW_HRESIZE_CURSOR` (#427)
- - Added `GLFW_RESIZE_NS_CURSOR` alias for `GLFW_VRESIZE_CURSOR` (#427)
- - Added `GLFW_POINTING_HAND_CURSOR` alias for `GLFW_HAND_CURSOR` (#427)
- - Updated the minimum required CMake version to 3.1
- - Disabled tests and examples by default when built as a CMake subdirectory
  - Bugfix: The CMake config-file package used an absolute path and was not
    relocatable (#1470)
  - Bugfix: Video modes with a duplicate screen area were discarded (#1555,#1556)
  - Bugfix: Compiling with -Wextra-semi caused warnings (#1440)
  - Bugfix: Built-in mappings failed because some OEMs re-used VID/PID (#1583)
- - [Win32] Added the `GLFW_WIN32_KEYBOARD_MENU` window hint for enabling access
-           to the window menu
- - [Win32] Added a version info resource to the GLFW DLL
  - [Win32] Bugfix: `GLFW_INCLUDE_VULKAN` plus `VK_USE_PLATFORM_WIN32_KHR` caused
    symbol redefinition (#1524)
  - [Win32] Bugfix: The cursor position event was emitted before its cursor enter
@@ -158,12 +148,7 @@ information on what to include when reporting a bug.
  - [X11] Bugfix: Disabled cursor mode was interrupted by indicator windows
  - [X11] Bugfix: Monitor physical dimensions could be reported as zero mm
  - [X11] Bugfix: Window position events were not emitted during resizing (#1613)
- - [X11] Bugfix: `glfwFocusWindow` could terminate on older WMs or without a WM
- - [Wayland] Removed support for `wl_shell` (#1443)
  - [Wayland] Bugfix: The `GLFW_HAND_CURSOR` shape used the wrong image (#1432)
- - [Wayland] Bugfix: `CLOCK_MONOTONIC` was not correctly enabled
- - [POSIX] Bugfix: `CLOCK_MONOTONIC` was not correctly tested for or enabled
- - [NSGL] Removed enforcement of forward-compatible flag for core contexts
  - [NSGL] Bugfix: `GLFW_COCOA_RETINA_FRAMEBUFFER` had no effect on newer
    macOS versions (#1442)
  - [NSGL] Bugfix: Workaround for swap interval on 10.14 broke on 10.12 (#1483)

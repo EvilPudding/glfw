@@ -174,10 +174,8 @@ static GLFWbool openJoystickDevice(const char* path)
         return GLFW_FALSE;
     }
 
-
     if (ioctl(linjs.fd, EVIOCGNAME(sizeof(name)), name) < 0)
         strncpy(name, "Unknown", sizeof(name));
-
 
     /* Generate a joystick GUID that matches the SDL 2.0.5+ one */
     if (id.vendor && id.product && id.version)

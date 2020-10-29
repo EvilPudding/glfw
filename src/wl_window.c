@@ -770,6 +770,28 @@ static void handleEvents(int timeout)
     }
 }
 
+/* Translates a GLFW standard cursor to a theme cursor name
+ */
+static char *translateCursorShape(int shape)
+{
+    switch (shape)
+    {
+        case GLFW_ARROW_CURSOR:
+            return "left_ptr";
+        case GLFW_IBEAM_CURSOR:
+            return "xterm";
+        case GLFW_CROSSHAIR_CURSOR:
+            return "crosshair";
+        case GLFW_HAND_CURSOR:
+            return "hand2";
+        case GLFW_HRESIZE_CURSOR:
+            return "sb_h_double_arrow";
+        case GLFW_VRESIZE_CURSOR:
+            return "sb_v_double_arrow";
+    }
+    return NULL;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //////                       GLFW platform API                      //////
 //////////////////////////////////////////////////////////////////////////

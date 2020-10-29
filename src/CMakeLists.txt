@@ -72,14 +72,22 @@ if (_GLFW_WAYLAND)
     target_sources(glfw PRIVATE ${GLFW_WAYLAND_PROTOCOL_SOURCES})
 endif()
 
-if (WIN32 AND BUILD_SHARED_LIBS)
-    configure_file(glfw.rc.in glfw.rc @ONLY)
-    target_sources(glfw PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/glfw.rc")
+if (_GLFW_X11 OR _GLFW_WAYLAND)
+    if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+        set(glfw_HEADERS ${glfw_HEADERS} linux_joystick.h)
+        set(glfw_SOURCES ${glfw_SOURCES} linux_joystick.c)
+    else()
+        set(glfw_HEADERS ${glfw_HEADERS} null_joystick.h)
+        set(glfw_SOURCES ${glfw_SOURCES} null_joystick.c)
+    endif()
 endif()
 
-configure_file(glfw_config.h.in glfw_config.h @ONLY)
-target_compile_definitions(glfw PRIVATE _GLFW_USE_CONFIG_H)
-target_sources(glfw PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/glfw_config.h")
+if (APPLE)
+    # For some reason CMake didn't know about .m until version 3.16
+    set_source_files_properties(cocoa_init.m cocoa_joystick.m cocoa_monitor.m
+                                cocoa_window.m nsgl_context.m PROPERTIES
+                                LANGUAGE C)
+endif()
 
 set_target_properties(glfw PROPERTIES
                       OUTPUT_NAME ${GLFW_LIB_NAME}
@@ -91,6 +99,19 @@ set_target_properties(glfw PROPERTIES
                       DEFINE_SYMBOL _GLFW_BUILD_DLL
                       FOLDER "GLFW3")
 
+if (${CMAKE_VERSION} VERSION_EQUAL "3.1.0" OR
+    ${CMAKE_VERSION} VERSION_GREATER "3.1.0")
+
+    set_target_properties(glfw PROPERTIES C_STANDARD 99)
+else()
+    # Remove this fallback when removing support for CMake version less than 3.1
+    target_compile_options(glfw PRIVATE
+                           "$<$<C_COMPILER_ID:AppleClang>:-std=c99>"
+                           "$<$<C_COMPILER_ID:Clang>:-std=c99>"
+                           "$<$<C_COMPILER_ID:GNU>:-std=c99>")
+endif()
+
+target_compile_definitions(glfw PRIVATE _GLFW_USE_CONFIG_H)
 target_include_directories(glfw PUBLIC
                            "$<BUILD_INTERFACE:${GLFW_SOURCE_DIR}/include>"
                            "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
@@ -98,14 +119,7 @@ target_include_directories(glfw PRIVATE
                            "${GLFW_SOURCE_DIR}/src"
                            "${GLFW_BINARY_DIR}/src"
                            ${glfw_INCLUDE_DIRS})
-target_link_libraries(glfw PRIVATE Threads::Threads ${glfw_LIBRARIES})
-
-if (APPLE)
-    # For some reason CMake didn't know about .m until version 3.16
-    set_source_files_properties(cocoa_init.m cocoa_joystick.m cocoa_monitor.m
-                                cocoa_window.m nsgl_context.m PROPERTIES
-                                LANGUAGE C)
-endif()
+target_link_libraries(glfw PRIVATE ${glfw_LIBRARIES})
 
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR
     "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" OR
@@ -152,6 +166,11 @@ if (BUILD_SHARED_LIBS)
             # Add a suffix to the import library to avoid naming conflicts
             set_target_properties(glfw PROPERTIES IMPORT_SUFFIX "dll.lib")
         endif()
+
+        target_compile_definitions(glfw INTERFACE GLFW_DLL)
+    elseif (APPLE)
+        # Add -fno-common to work around a bug in Apple's GCC
+        target_compile_options(glfw PRIVATE "-fno-common")
 
         target_compile_definitions(glfw INTERFACE GLFW_DLL)
     elseif (APPLE)

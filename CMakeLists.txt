@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(GLFW VERSION 3.4.0 LANGUAGES C)
+project(GLFW VERSION 3.3.1 LANGUAGES C)
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 OFF)
 
@@ -36,6 +36,10 @@ cmake_dependent_option(GLFW_USE_WAYLAND "Use Wayland for window creation" OFF
                        "UNIX;NOT APPLE" OFF)
 cmake_dependent_option(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC runtime library DLL" ON
                        "MSVC" OFF)
+
+if (BUILD_SHARED_LIBS)
+    set(_GLFW_BUILD_DLL 1)
+endif()
 
 if (BUILD_SHARED_LIBS AND UNIX)
     # On Unix-like systems, shared libraries can use the soname system.
@@ -225,6 +229,12 @@ if (_GLFW_X11)
     if (NOT X11_Xi_INCLUDE_PATH)
         message(FATAL_ERROR "XInput headers not found; install libxi development package")
     endif()
+
+    list(APPEND glfw_INCLUDE_DIRS "${X11_Xrandr_INCLUDE_PATH}"
+                                  "${X11_Xinerama_INCLUDE_PATH}"
+                                  "${X11_Xkb_INCLUDE_PATH}"
+                                  "${X11_Xcursor_INCLUDE_PATH}"
+                                  "${X11_Xi_INCLUDE_PATH}")
 endif()
 
 #--------------------------------------------------------------------

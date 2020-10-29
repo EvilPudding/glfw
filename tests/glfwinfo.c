@@ -772,9 +772,15 @@ int main(int argc, char** argv)
 
     if (glfwVulkanSupported())
     {
-        gladLoadVulkanUserPtr(NULL, glad_vulkan_callback, NULL);
-
         uint32_t loader_version = VK_API_VERSION_1_0;
+        uint32_t i, re_count, pd_count;
+        const char** re;
+        VkApplicationInfo ai = {0};
+        VkInstanceCreateInfo ici = {0};
+        VkInstance instance;
+        VkPhysicalDevice* pd;
+
+        gladLoadVulkanUserPtr(NULL, glad_vulkan_callback, NULL);
 
         if (vkEnumerateInstanceVersion)
         {
@@ -787,8 +793,7 @@ int main(int argc, char** argv)
                VK_VERSION_MAJOR(loader_version),
                VK_VERSION_MINOR(loader_version));
 
-        uint32_t re_count;
-        const char** re = glfwGetRequiredInstanceExtensions(&re_count);
+        re = glfwGetRequiredInstanceExtensions(&re_count);
 
         printf("Vulkan required instance extensions:");
         if (re)
@@ -811,6 +816,11 @@ int main(int argc, char** argv)
         ai.applicationVersion = VK_MAKE_VERSION(GLFW_VERSION_MAJOR,
                                                 GLFW_VERSION_MINOR,
                                                 GLFW_VERSION_REVISION);
+
+        if (loader_version >= VK_API_VERSION_1_1)
+            ai.apiVersion = VK_API_VERSION_1_1;
+        else
+            ai.apiVersion = VK_API_VERSION_1_0;
 
         if (loader_version >= VK_API_VERSION_1_1)
             ai.apiVersion = VK_API_VERSION_1_1;
@@ -843,7 +853,7 @@ int main(int argc, char** argv)
 
             vkGetPhysicalDeviceProperties(pd[i], &pdp);
 
-            printf("Vulkan %s device: \"%s\" (API version %i.%i)\n",
+            printf("Vulkan %s device: \"%s\" API version %i.%i\n",
                    get_device_type_name(pdp.deviceType),
                    pdp.deviceName,
                    VK_VERSION_MAJOR(pdp.apiVersion),
